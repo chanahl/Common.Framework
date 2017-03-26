@@ -24,7 +24,7 @@ namespace Common.Framework.Core.AppRunners
 
         protected Assembly Assembly { get; set; }
 
-        private Dictionary<string, object> Objects { get; }
+        private Dictionary<string, object> Objects { get; set; }
 
         protected IEnumerable<string> GetCatalogue(
             string nameSpace)

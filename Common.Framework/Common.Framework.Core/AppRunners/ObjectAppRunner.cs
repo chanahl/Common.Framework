@@ -20,7 +20,7 @@ namespace Common.Framework.Core.AppRunners
             Objects = new Dictionary<string, object>();
         }
 
-        private Dictionary<string, object> Objects { get; }
+        private Dictionary<string, object> Objects { get; set; }
         
         protected virtual void RegisterObjects<T>(
             AssemblyType assemblyType,

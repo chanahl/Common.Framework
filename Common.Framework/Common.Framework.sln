@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Framework.Math", "Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Framework.Data", "Common.Framework.Data\Common.Framework.Data.csproj", "{AD5E99A3-2A10-4E43-BDEF-ABDAE18B8FAB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Framework.Utilities", "Common.Framework.Utilities\Common.Framework.Utilities.csproj", "{F2C90B13-9D2A-4CB6-88F7-6B8F10B0801C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{AD5E99A3-2A10-4E43-BDEF-ABDAE18B8FAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD5E99A3-2A10-4E43-BDEF-ABDAE18B8FAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD5E99A3-2A10-4E43-BDEF-ABDAE18B8FAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2C90B13-9D2A-4CB6-88F7-6B8F10B0801C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2C90B13-9D2A-4CB6-88F7-6B8F10B0801C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2C90B13-9D2A-4CB6-88F7-6B8F10B0801C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2C90B13-9D2A-4CB6-88F7-6B8F10B0801C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

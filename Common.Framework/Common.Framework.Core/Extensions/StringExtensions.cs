@@ -5,12 +5,32 @@
 // <author>Alex H.-L. Chan</author>
 
 using System;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace Common.Framework.Core.Extensions
 {
     public static class StringExtensions
     {
+        public static string ResolveAsUnc(this string server)
+        {
+            return server.StartsWith(@"\\") ? server : @"\\" + server;
+        }
+
+        public static string ResolveAsUnc(
+            this string server,
+            string path)
+        {
+            return
+                server.StartsWith(@"\\")
+                    ? path.Contains(":")
+                        ? Path.Combine(server, path.Replace(":", "$"))
+                        : Path.Combine(server, path)
+                    : path.Contains(":")
+                        ? Path.Combine(@"\\", server, path.Replace(":", "$"))
+                        : Path.Combine(@"\\", server, path);
+        }
+
         public static string Separate(this string pascalCaseString)
         {
             var regex = new Regex(@"(?<=[A-Z])(?=[A-Z][a-z])|(?<=[^A-Z])(?=[A-Z])|(?<=[A-Za-z])(?=[^A-Za-z])");

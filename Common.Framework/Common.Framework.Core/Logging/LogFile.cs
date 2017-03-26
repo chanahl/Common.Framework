@@ -20,7 +20,7 @@ namespace Common.Framework.Core.Logging
             LogFileName = logFileName;
         }
 
-        public string LogFileName { get; }
+        public string LogFileName { get; private set; }
 
         public void Initialize()
         {
