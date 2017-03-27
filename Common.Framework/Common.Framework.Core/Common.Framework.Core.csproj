@@ -81,6 +81,7 @@
     <Compile Include="Patterns\Subject.cs" />
     <Compile Include="Performance\StopwatchManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="System\Process.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
