@@ -41,6 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Common.Framework.AssemblyInfo.cs">
+      <Link>Properties\Common.Framework.AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Interfaces\IFlatFileDataManager.cs" />
     <Compile Include="Managers\FlatFileDataManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

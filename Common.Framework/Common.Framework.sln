@@ -11,6 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Framework.Data", "Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Framework.Utilities", "Common.Framework.Utilities\Common.Framework.Utilities.csproj", "{F2C90B13-9D2A-4CB6-88F7-6B8F10B0801C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{AE0ADC2C-4187-4F04-B68D-E0FC9EE4769E}"
+	ProjectSection(SolutionItems) = preProject
+		Common.Framework.AssemblyInfo.cs = Common.Framework.AssemblyInfo.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

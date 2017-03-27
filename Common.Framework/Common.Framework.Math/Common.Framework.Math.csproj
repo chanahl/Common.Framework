@@ -42,6 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Common.Framework.AssemblyInfo.cs">
+      <Link>Properties\Common.Framework.AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Algebra\Exponentiation.cs" />
     <Compile Include="Algebra\General.cs" />
     <Compile Include="Algebra\PrimeNumbers.cs" />
