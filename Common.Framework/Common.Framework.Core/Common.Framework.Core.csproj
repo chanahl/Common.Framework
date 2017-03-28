@@ -73,6 +73,7 @@
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\UrlExtensions.cs" />
+    <Compile Include="Extensions\XmlExtensions.cs" />
     <Compile Include="Logging\LogFile.cs" />
     <Compile Include="Logging\LogManager.cs" />
     <Compile Include="Logging\LogMessage.cs" />
