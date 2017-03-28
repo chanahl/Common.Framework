@@ -6,12 +6,40 @@
 
 using System;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Common.Framework.Core.Extensions
 {
     public static class StringExtensions
     {
+        public static bool Contains(
+            this string source,
+            string stringToCheck,
+            StringComparison stringComparison)
+        {
+            return source != null && stringToCheck != null && source.IndexOf(stringToCheck, stringComparison) >= 0;
+        }
+
+        public static bool ContainsNotFound(
+            this string source,
+            StringComparison stringComparison)
+        {
+            return source.IndexOf(@"not found", stringComparison) >= 0;
+        }
+
+        public static string PadLeft(
+            this string source,
+            string stringToPad,
+            int timesToRepeat)
+        {
+            var padLeft = new StringBuilder(stringToPad.Length * timesToRepeat)
+                .Insert(0, stringToPad, timesToRepeat)
+                .Append(source)
+                .ToString();
+            return padLeft;
+        }
+
         public static string ResolveAsUnc(this string server)
         {
             return server.StartsWith(@"\\") ? server : @"\\" + server;

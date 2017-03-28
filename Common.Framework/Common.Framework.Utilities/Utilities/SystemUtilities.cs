@@ -4,12 +4,42 @@
 // <clrversion>4.0.30319.42000</clrversion>
 // <author>Alex H.-L. Chan</author>
 
+using System.IO;
 using System.Management;
 
 namespace Common.Framework.Utilities.Utilities
 {
     public static class SystemUtilities
     {
+        public static string GetDrive(
+            DriveType driveType,
+            string driveLetter)
+        {
+            var drives = DriveInfo.GetDrives();
+            foreach (var drive in drives)
+            {
+                var driveName = drive.Name.Substring(0, 1);
+                switch (driveType)
+                {
+                    case DriveType.CDRom:
+                    case DriveType.Fixed:
+                    case DriveType.Network:
+                    case DriveType.NoRootDirectory:
+                    case DriveType.Ram:
+                    case DriveType.Removable:
+                    case DriveType.Unknown:
+                        if (driveLetter.Equals(driveName))
+                        {
+                            return drive.Name;
+                        }
+
+                        break;
+                }
+            }
+
+            return string.Empty;
+        }
+
         public static int GetCores()
         {
             var count = 0;
