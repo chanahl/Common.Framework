@@ -520,6 +520,26 @@ namespace Common.Framework.Core.Extensions
             }
         }
 
+        public static void RemoveDirectories(
+            this string rootDirectory,
+            string searchPattern,
+            int directoriesToKeep)
+        {
+            var directories = Directory.GetDirectories(rootDirectory, "*" + searchPattern + "*")
+                .OrderByDescending(name => name).ToList();
+            var directoriesCount = directories.Count;
+            if (directoriesCount <= directoriesToKeep)
+            {
+                return;
+            }
+
+            directories.RemoveRange(0, directoriesToKeep);
+            foreach (var directory in directories)
+            {
+                DeleteDirectory(directory, true);
+            }
+        }
+
         public static void RemoveSubdirectories(
             this string rootDirectory,
             int subdirectoriesToKeep,
