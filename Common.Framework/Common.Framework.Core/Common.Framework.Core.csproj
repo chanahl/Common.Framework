@@ -64,14 +64,17 @@
     <Compile Include="Enums\DelimiterType.cs" />
     <Compile Include="Enums\EnvironmentType.cs" />
     <Compile Include="Enums\LogSeverity.cs" />
+    <Compile Include="Enums\MsBuildToolsVersion.cs" />
     <Compile Include="Enums\StatusType.cs" />
     <Compile Include="Extensions\AssemblyExtensions.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
+    <Compile Include="Extensions\ConvertExtensions.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Extensions\DirectoryInfoExtensions.cs" />
     <Compile Include="Extensions\FileSystemExtensions.cs" />
     <Compile Include="Extensions\IntegerExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
+    <Compile Include="Extensions\MsBuildToolsExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\UrlExtensions.cs" />
@@ -92,12 +95,11 @@
   <PropertyGroup>
     <PostBuildEvent>SET "outputDir=$(ProjectDir)..\..\Artifacts"
 MD %25outputDir%25 2&gt;NUL
+
 SET "output=%25outputDir%25\$(TargetName).dll"
 IF EXIST %25output%25 (ATTRIB -R %25output%25)
 COPY $(TargetDir)$(TargetName).dll %25output%25
 
-SET "outputDir=$(ProjectDir)..\..\Artifacts"
-MD %25outputDir%25 2&gt;NUL
 SET "output=%25outputDir%25\$(TargetName).pdb"
 IF EXIST %25output%25 (ATTRIB -R %25output%25)
 COPY $(TargetDir)$(TargetName).pdb %25output%25</PostBuildEvent>

@@ -17,6 +17,11 @@ namespace Common.Framework.Core.Collections.Custom
             _queue = new SortedList<Pair<int>, T>(new PairComparer<int>());
         }
 
+        public SortedList<Pair<int>, T> Queue
+        {
+            get { return _queue; }
+        }
+
         public int Count { get; private set; }
 
         public void Enqueue(T item, int priority)
