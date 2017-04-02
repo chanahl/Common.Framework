@@ -13,10 +13,8 @@ namespace Common.Framework.Deployment.Applications
     {
         private const string SqlPackageExe = "SqlPackage.exe";
 
-        public SqlPackage(
-            SqlDatabaseDeploymentInfo deploymentInfo,
-            int timeoutInminutes)
-            : base(deploymentInfo, timeoutInminutes)
+        public SqlPackage(SqlDatabaseDeploymentInfo deploymentInfo)
+            : base(deploymentInfo)
         {
         }
 

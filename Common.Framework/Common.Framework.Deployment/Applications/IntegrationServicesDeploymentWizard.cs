@@ -13,10 +13,7 @@ namespace Common.Framework.Deployment.Applications
     {
         private const string IsDeploymentWizardExe = "ISDeploymentWizard.exe";
 
-        public IntegrationServicesDeploymentWizard(
-            SqlIspacDeploymentInfo deploymentInfo,
-            int timeoutInminutes)
-            : base(deploymentInfo, timeoutInminutes)
+        public IntegrationServicesDeploymentWizard(SqlIspacDeploymentInfo deploymentInfo) : base(deploymentInfo)
         {
         }
 

@@ -13,10 +13,7 @@ namespace Common.Framework.Deployment.Applications
     {
         private const string OSqlExe = "OSQL.exe";
 
-        public OSql(
-            SqlDatabaseDeploymentInfo deploymentInfo,
-            int timeoutInminutes)
-            : base(deploymentInfo, timeoutInminutes)
+        public OSql(SqlDatabaseDeploymentInfo deploymentInfo) : base(deploymentInfo)
         {
         }
 

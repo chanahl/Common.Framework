@@ -15,10 +15,7 @@ namespace Common.Framework.Deployment.Applications
     public abstract class SqlServerApplication<TDeploymentInfo> : Application<TDeploymentInfo>
         where TDeploymentInfo : DeploymentInfo
     {
-        protected SqlServerApplication(
-            TDeploymentInfo deploymentInfo,
-            int timeoutInminutes)
-            : base(deploymentInfo, timeoutInminutes)
+        protected SqlServerApplication(TDeploymentInfo deploymentInfo) : base(deploymentInfo)
         {
             if (!SqlApplication.Exists)
             {
@@ -46,7 +43,7 @@ namespace Common.Framework.Deployment.Applications
                 }
             }
         }
-        
+
         protected FileInfo SqlApplication
         {
             get { return GetSqlApplication(); }

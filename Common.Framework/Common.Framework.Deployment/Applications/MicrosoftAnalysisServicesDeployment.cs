@@ -13,10 +13,7 @@ namespace Common.Framework.Deployment.Applications
     {
         private const string MicrosoftAnalysisServicesDeploymentExe = "Microsoft.AnalysisServices.Deployment.exe";
 
-        public MicrosoftAnalysisServicesDeployment(
-            SqlDatabaseDeploymentInfo deploymentInfo,
-            int timeoutInminutes)
-            : base(deploymentInfo, timeoutInminutes)
+        public MicrosoftAnalysisServicesDeployment(SqlDatabaseDeploymentInfo deploymentInfo) : base(deploymentInfo)
         {
         }
 

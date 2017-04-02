@@ -17,9 +17,8 @@ namespace Common.Framework.Deployment.Applications
     {
         protected MsBuild(
             MsBuildToolsVersion msBuildToolsVersion,
-            TDeploymentInfo deploymentInfo,
-            int timeoutInMinutes)
-            : base(deploymentInfo, timeoutInMinutes)
+            TDeploymentInfo deploymentInfo)
+            : base(deploymentInfo)
         {
             MsBuildToolsVersion = msBuildToolsVersion;
 
@@ -37,7 +36,7 @@ namespace Common.Framework.Deployment.Applications
             {
                 DeploymentInfo.CommandFile.EnsureDirectory();
                 var command = string.Format(
-                    "\"{0}\" \"{1}\" {2}", 
+                    "\"{0}\" \"{1}\" {2}",
                     MsBuildExe.FullName,
                     DeploymentInfo.Item.ToString(),
                     MsBuildSwitchParameters);

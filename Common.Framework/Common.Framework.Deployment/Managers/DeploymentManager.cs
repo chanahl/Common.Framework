@@ -5,6 +5,8 @@
 // <author>Alex H.-L. Chan</author>
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using Common.Framework.Core.Collections.Custom;
 using Common.Framework.Core.Extensions;
 using Common.Framework.Core.Logging;
@@ -15,12 +17,18 @@ namespace Common.Framework.Deployment.Managers
 {
     public abstract class DeploymentManager<TDeploymentInfo> where TDeploymentInfo : DeploymentInfo
     {
-        protected DeploymentManager(int timeoutInMinutes)
+        protected DeploymentManager(
+            List<FileInfo> deploymentEntries,
+            bool isInteractive = false)
         {
-            TimeoutInMinutes = timeoutInMinutes;
+            DeploymentEntries = deploymentEntries;
+
+            IsInteractive = isInteractive;
         }
 
-        public int TimeoutInMinutes { get; set; }
+        public List<FileInfo> DeploymentEntries { get; private set; }
+
+        public bool IsInteractive { get; private set; }
 
         protected PriorityQueue<TDeploymentInfo> DeploymentItems { get; set; }
 
@@ -66,34 +74,26 @@ namespace Common.Framework.Deployment.Managers
                 {
                     case DeploymentType.AsDatabase:
                         var microsoftAnalysisServicesDeployment = new MicrosoftAnalysisServicesDeployment(
-                            deploymentItem.Value as SqlDatabaseDeploymentInfo,
-                            TimeoutInMinutes);
+                            deploymentItem.Value as SqlDatabaseDeploymentInfo);
                         deploymentStatus = microsoftAnalysisServicesDeployment.Deploy();
                         break;
                     case DeploymentType.Dacpac:
-                        var sqlPackage = new SqlPackage(
-                            deploymentItem.Value as SqlDatabaseDeploymentInfo,
-                            TimeoutInMinutes);
+                        var sqlPackage = new SqlPackage(deploymentItem.Value as SqlDatabaseDeploymentInfo);
                         deploymentStatus = sqlPackage.Deploy();
                         break;
                     case DeploymentType.Ispac:
                         var integrationServicesDeploymentWizard = new IntegrationServicesDeploymentWizard(
-                            deploymentItem.Value as SqlIspacDeploymentInfo,
-                            TimeoutInMinutes);
+                            deploymentItem.Value as SqlIspacDeploymentInfo);
                         deploymentStatus = integrationServicesDeploymentWizard.Deploy();
                         break;
                     case DeploymentType.Sql:
-                        var osql = new OSql(
-                            deploymentItem.Value as SqlDatabaseDeploymentInfo,
-                            TimeoutInMinutes);
+                        var osql = new OSql(deploymentItem.Value as SqlDatabaseDeploymentInfo);
                         deploymentStatus = osql.Deploy();
                         break;
-                    ////case DeploymentType.WebService:
-                    ////    var webServiceDeployer = new WebService(
-                    ////        deploymentItem.Value as WebServiceDeploymentInfo,
-                    ////        TimeoutInMinutes);
-                    ////    deploymentStatus = webServiceDeployer.Deploy();
-                    ////    break;
+                        ////case DeploymentType.WebService:
+                        ////    var webServiceDeployer = new WebService(deploymentItem.Value as WebServiceDeploymentInfo);
+                        ////    deploymentStatus = webServiceDeployer.Deploy();
+                        ////    break;
                 }
 
                 if (deploymentStatus)

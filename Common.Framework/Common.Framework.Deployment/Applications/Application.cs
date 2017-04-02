@@ -14,21 +14,15 @@ namespace Common.Framework.Deployment.Applications
 {
     public abstract class Application<TDeploymentInfo> where TDeploymentInfo : DeploymentInfo
     {
-        protected Application(
-            TDeploymentInfo deploymentInfo,
-            int timeoutInMinutes)
+        protected Application(TDeploymentInfo deploymentInfo)
         {
             DeploymentInfo = deploymentInfo;
-
-            TimeoutInMinnutes = timeoutInMinutes;
         }
 
         protected TDeploymentInfo DeploymentInfo { get; private set; }
 
         protected ProcessStartInfo ProcessStartInfo { get; set; }
-
-        protected int TimeoutInMinnutes { get; set; }
-
+        
         public bool Deploy()
         {
             try
@@ -58,7 +52,7 @@ namespace Common.Framework.Deployment.Applications
             if (DeploymentInfo.IsInteractive)
             {
                 var process = new Core.System.Process(ProcessStartInfo, processName);
-                processStatus = process.Start(TimeoutInMinnutes);
+                processStatus = process.Start(DeploymentInfo.TimeoutInMinutes);
             }
             else
             {
@@ -66,7 +60,7 @@ namespace Common.Framework.Deployment.Applications
                 logFile.EnsureDirectory();
 
                 var process = new Core.System.Process(ProcessStartInfo, processName, logFile);
-                processStatus = process.Start(TimeoutInMinnutes);
+                processStatus = process.Start(DeploymentInfo.TimeoutInMinutes);
             }
 
             return processStatus;

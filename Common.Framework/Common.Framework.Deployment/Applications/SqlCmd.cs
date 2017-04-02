@@ -13,10 +13,7 @@ namespace Common.Framework.Deployment.Applications
     {
         private const string SqlCmdExe = "SQLCMD.exe";
 
-        public SqlCmd(
-            SqlDatabaseDeploymentInfo deploymentInfo,
-            int timeoutInminutes)
-            : base(deploymentInfo, timeoutInminutes)
+        public SqlCmd(SqlDatabaseDeploymentInfo deploymentInfo) : base(deploymentInfo)
         {
         }
 

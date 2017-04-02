@@ -17,5 +17,7 @@ namespace Common.Framework.Deployment.Info
         public object Item { get; set; }
 
         public string LogFile { get; set; }
+
+        public int TimeoutInMinutes { get; set; }
     }
 }
