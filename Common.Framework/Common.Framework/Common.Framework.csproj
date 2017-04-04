@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{47FE1F71-6E58-44D1-A1C0-DF246C35C295}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Common.Framework</RootNamespace>
+    <AssemblyName>Common.Framework</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Common.Framework.AssemblyInfo.cs">
+      <Link>Properties\Common.Framework.AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".nuget\nuget.exe" />
+    <None Include="App.config" />
+    <None Include="Common.Framework.nuspec" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="favicon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Framework.Bots\Common.Framework.Bots.csproj">
+      <Project>{673a28f6-6690-407e-b930-3f2428f90b0b}</Project>
+      <Name>Common.Framework.Bots</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Common.Framework.Core\Common.Framework.Core.csproj">
+      <Project>{45e5354d-c8f5-4bf1-a495-7f4efd598e77}</Project>
+      <Name>Common.Framework.Core</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Common.Framework.Data\Common.Framework.Data.csproj">
+      <Project>{ad5e99a3-2a10-4e43-bdef-abdae18b8fab}</Project>
+      <Name>Common.Framework.Data</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Common.Framework.Deployment\Common.Framework.Deployment.csproj">
+      <Project>{d89abe9b-fce0-40b2-8708-f6429a5bb5d3}</Project>
+      <Name>Common.Framework.Deployment</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Common.Framework.Math\Common.Framework.Math.csproj">
+      <Project>{12016600-ee0a-4bf7-9a2c-a68710b20a19}</Project>
+      <Name>Common.Framework.Math</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Common.Framework.Network\Common.Framework.Network.csproj">
+      <Project>{17f4d713-14b6-4c2c-821e-9195bc337fdf}</Project>
+      <Name>Common.Framework.Network</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Common.Framework.Utilities\Common.Framework.Utilities.csproj">
+      <Project>{f2c90b13-9d2a-4cb6-88f7-6b8f10b0801c}</Project>
+      <Name>Common.Framework.Utilities</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>SET "output=$(ProjectDir)..\..\Artifacts"
+MD %25output%25 2&gt;NUL
+SET suffixOption=
+IF $(ConfigurationName)==Debug SET "suffixOption=-Suffix alpha"
+$(ProjectDir)\.nuget\nuget.exe pack $(ProjectDir)$(ProjectFileName) -IncludeReferencedProjects -Tool -Output %25output%25 %25suffixOption%25
+$(ProjectDir)\.nuget\nuget.exe pack $(ProjectDir)$(ProjectFileName) -IncludeReferencedProjects -Tool -Symbols -Output %25output%25 %25suffixOption%25</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
