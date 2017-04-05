@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{47FE1F71-6E58-44D1-A1C0-DF246C35C295}</ProjectGuid>
+    <ProjectGuid>{39E80019-F5EF-46E6-B0ED-B7ECA8F0A268}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Common.Framework</RootNamespace>
@@ -12,6 +12,16 @@
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'CI|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -43,6 +53,7 @@
     <None Include=".nuget\nuget.exe" />
     <None Include="App.config" />
     <None Include="Common.Framework.nuspec" />
+    <None Include="README.txt" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
@@ -86,12 +97,15 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>SET "output=$(ProjectDir)..\..\Artifacts"
+    <PostBuildEvent>IF $(ConfigurationName)==Debug (EXIT)
+SET "configuration="
+SET "suffixOption="
+IF $(ConfigurationName)==CI (SET "configuration=Debug" &amp; SET "suffixOption=-Suffix ci" &amp; GOTO Pack)
+IF $(ConfigurationName)==Release (SET "configuration=Release" &amp; GOTO Pack)
+:Pack
+SET "output=$(ProjectDir)..\..\..\..\.nupkgs"
 MD %25output%25 2&gt;NUL
-SET suffixOption=
-IF $(ConfigurationName)==Debug SET "suffixOption=-Suffix alpha"
-$(ProjectDir)\.nuget\nuget.exe pack $(ProjectDir)$(ProjectFileName) -IncludeReferencedProjects -Tool -Output %25output%25 %25suffixOption%25
-$(ProjectDir)\.nuget\nuget.exe pack $(ProjectDir)$(ProjectFileName) -IncludeReferencedProjects -Tool -Symbols -Output %25output%25 %25suffixOption%25</PostBuildEvent>
+$(ProjectDir)\.nuget\nuget.exe pack $(ProjectDir)$(ProjectFileName) -IncludeReferencedProjects -Tool -Output %25output%25 %25suffixOption%25 -Properties Configuration=%25configuration%25 -Symbols</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
