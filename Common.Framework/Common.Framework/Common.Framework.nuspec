@@ -26,7 +26,7 @@
     <version>$version$</version>
     <description>$description$</description>
     <authors>$author$</authors>
-    <title>$title$</title>
+    <title>$title$-$version$</title>
     <owners>$author$</owners>
     <projectUrl>https://github.com/chanahl/.NET</projectUrl>
     <licenseUrl>https://github.com/chanahl/.NET/blob/master/LICENSE</licenseUrl>
