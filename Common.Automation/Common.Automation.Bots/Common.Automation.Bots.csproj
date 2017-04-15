@@ -83,16 +83,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(ProjectDir)\..\..\..\..\Shared\Microsoft\StyleCop\4.7\StyleCop.targets" />
   <PropertyGroup>
-    <PostBuildEvent>SET "outputDir=$(ProjectDir)..\..\Artifacts"
-MD %25outputDir%25 2&gt;NUL
-
-SET "output=%25outputDir%25\$(TargetName).dll"
-IF EXIST %25output%25 (ATTRIB -R %25output%25)
-COPY $(TargetDir)$(TargetName).dll %25output%25
-
-SET "output=%25outputDir%25\$(TargetName).pdb"
-IF EXIST %25output%25 (ATTRIB -R %25output%25)
-COPY $(TargetDir)$(TargetName).pdb %25output%25</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
