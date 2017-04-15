@@ -42,8 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Common.Framework.AssemblyInfo.cs">
-      <Link>Properties\Common.Framework.AssemblyInfo.cs</Link>
+    <Compile Include="..\..\Common.Shared.AssemblyInfo.cs">
+      <Link>Properties\Common.Shared.AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\ConsoleUtilities.cs" />

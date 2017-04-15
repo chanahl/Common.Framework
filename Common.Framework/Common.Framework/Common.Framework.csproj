@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{39E80019-F5EF-46E6-B0ED-B7ECA8F0A268}</ProjectGuid>
+    <ProjectGuid>{94DDA921-B36C-446F-A1BD-A885B97E3D64}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Common.Framework</RootNamespace>
@@ -43,8 +43,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Common.Framework.AssemblyInfo.cs">
-      <Link>Properties\Common.Framework.AssemblyInfo.cs</Link>
+    <Compile Include="..\..\Common.Shared.AssemblyInfo.cs">
+      <Link>Properties\Common.Shared.AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -56,14 +56,6 @@
     <None Include="README.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="favicon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Common.Framework.Bots\Common.Framework.Bots.csproj">
-      <Project>{673a28f6-6690-407e-b930-3f2428f90b0b}</Project>
-      <Name>Common.Framework.Bots</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\Common.Framework.Core\Common.Framework.Core.csproj">
       <Project>{45e5354d-c8f5-4bf1-a495-7f4efd598e77}</Project>
       <Name>Common.Framework.Core</Name>
@@ -72,16 +64,6 @@
     <ProjectReference Include="..\Common.Framework.Data\Common.Framework.Data.csproj">
       <Project>{ad5e99a3-2a10-4e43-bdef-abdae18b8fab}</Project>
       <Name>Common.Framework.Data</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Common.Framework.Deployment\Common.Framework.Deployment.csproj">
-      <Project>{d89abe9b-fce0-40b2-8708-f6429a5bb5d3}</Project>
-      <Name>Common.Framework.Deployment</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Common.Framework.Math\Common.Framework.Math.csproj">
-      <Project>{12016600-ee0a-4bf7-9a2c-a68710b20a19}</Project>
-      <Name>Common.Framework.Math</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Common.Framework.Network\Common.Framework.Network.csproj">

@@ -43,8 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Common.Framework.AssemblyInfo.cs">
-      <Link>Properties\Common.Framework.AssemblyInfo.cs</Link>
+    <Compile Include="..\..\Common.Shared.AssemblyInfo.cs">
+      <Link>Properties\Common.Shared.AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AppConfig\AppConfig.cs" />
     <Compile Include="AppConfig\AppConfigCore.cs" />

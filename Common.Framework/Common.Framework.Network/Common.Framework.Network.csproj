@@ -41,11 +41,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Common.Shared.AssemblyInfo.cs">
+      <Link>Properties\Common.Shared.AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Distribution\Distributor.cs" />
     <Compile Include="Distribution\FileDistributor.cs" />
     <Compile Include="Distribution\FileTransfer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Common.Framework.AssemblyInfo.cs" />
     <Compile Include="Security\ImpersonationLevel.cs" />
     <Compile Include="Security\Impersonator.cs" />
     <Compile Include="Security\LogonProvider.cs" />
