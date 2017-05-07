@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyCompany("chanahl")]
-[assembly: AssemblyCopyright("Copyright © 2017")]
+[assembly: AssemblyCopyright("Copyright Â© 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -19,5 +19,5 @@ using System.Runtime.InteropServices;
 //      MAJOR version when you make incompatible API changes,
 //      MINOR version when you add functionality in a backwards-compatible manner, and
 //      PATCH version when you make backwards-compatible bug fixes.
-[assembly: AssemblyVersion("0.0.33")]
-[assembly: AssemblyFileVersion("0.0.33")]
+[assembly: AssemblyVersion("0.0.0")]
+[assembly: AssemblyFileVersion("0.0.0")]
