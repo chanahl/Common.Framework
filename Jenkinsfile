@@ -98,9 +98,7 @@ pipeline {
     
     stage('Tag') {
       when {
-        script {
-          currentBuild.result 'SUCCESS'
-        }
+        environment name: 'currentBuild.result', value: 'SUCCESS'
       }
       steps {
         script {
