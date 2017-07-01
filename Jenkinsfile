@@ -60,7 +60,7 @@ pipeline {
           def sonarQubeParameters = sprintf(
             '/k:%1$s /n:%2$s /v:%3$s /d:sonar.host.url=%4$s',
               [
-                "${JOB_BASE_NAME}-" + gitVersionProperties.GitVersion_PreReleaseLabel,
+                "${JOB_NAME}-" + gitVersionProperties.GitVersion_PreReleaseLabel,
                 "${JOB_BASE_NAME}",
                 gitVersionProperties.GitVersion_SemVer,
                 "http://desktop-nns09r8:8084"
@@ -98,7 +98,7 @@ pipeline {
     
     stage('Tag') {
       when {
-        environment name: 'currentBuild.result', value: 'SUCCESS'
+        environment name: 'currentBuild.result', value: ''
       }
       steps {
         script {
