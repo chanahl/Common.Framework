@@ -88,7 +88,7 @@ pipeline {
             bat "git tag ${tagParameters}"
             
             withCredentials([[
-              $class: 'UsernamePasswordMultiBinding',
+              $class: 'usernamePassword',
               credentialsId: 'd73c882b-5ce2-44e9-a7e1-5549105624eb',
               usernameVariable: 'credentialsUsername',
               passwordVariable: 'credentialsPassword']]) {
@@ -97,7 +97,7 @@ pipeline {
                   [
                     "${credentialsUsername}",
                     "${credentialsPassword}",
-                    "git@github.com:chanahl/Common.Framework.git"
+                    "github.com/chanahl/Common.Framework.git"
                   ])
                 bat "git push ${pushParameters} --tags"
               }
