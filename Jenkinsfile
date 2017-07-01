@@ -69,7 +69,7 @@ pipeline {
     
     stage("Build") {
       steps {
-        bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework.sln /p:Configuration=\"Debug\" /p:Platform=\"Any CPU\""
+        bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=\"Debug\" /p:Platform=\"Any CPU\""
       }
       
       post {
@@ -118,24 +118,16 @@ pipeline {
         }
       }
     }
-    
-    stage('NUnit') {
-      when {
-        expression { return nunit }
-      }
-      
-      steps {
-        bat '''MD "%WORKSPACE%\\.nunit-result"
-            "D:\\.nunit\\nunit-console-3.6.1\\nunit3-console.exe" "%WORKSPACE%\\Solutions\\TBSM.Vision.FpFtp.Application\\TBSM.Vision.FpFtp.Application.Test\\bin\\%CONFIGURATION%\\TBSM.Vision.FpFtp.Application.Test.dll" --config="%CONFIGURATION%" --x86 --result="%WORKSPACE%\\.nunit-result\\%JOB_BASE_NAME%-nunit-result.xml" --where "cat == FTP"
-            EXIT /B 0'''
-        step([
-          $class: 'NUnitPublisher',
-          testResultsPattern: '**/.nunit-result/${JOB_BASE_NAME}-nunit-result.xml',
-          debug: false,
-          keepJUnitReports: true,
-          skipJUnitArchiver: false,
-          failIfNoResults: false])
-      }
+  }
+  
+  post {
+    always {
+      emailext (
+        subject: "${currentBuild.result}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+        body: """<p>${currentBuild.result}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+                <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
+        to: "${DEFAULT_RECIPIENTS}"
+      )
     }
   }
 }
