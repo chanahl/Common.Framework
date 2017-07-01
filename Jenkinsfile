@@ -13,7 +13,7 @@ pipeline {
     }
     stage('NuGet Restore') {
       steps {
-        bat '%NUGET_RESTORE_COMMAND% Common.Framework\\Common.Framework.sln'
+        bat '%NUGET_RESTORE_COMMAND% Common.Framework.sln'
       }
     }
     stage('GitVersion') {
@@ -23,7 +23,7 @@ pipeline {
     }
   }
   environment {
-    gitVersionProperties = ''
-    nunit = ''
+    gitVersionProperties = null
+    nunit = null
   }
 }
