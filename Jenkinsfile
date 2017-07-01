@@ -77,37 +77,10 @@ pipeline {
       }
       
       post {
-        success {
-          script {
-            def tagParameters = sprintf(
-              '-a %1$s -m "%2$s"',
-              [
-                gitVersionProperties.GitVersion_SemVer,
-                "Tagged created by Jenkins."
-              ])
-            bat "git tag ${tagParameters}"
-            
-            withCredentials([[
-              $class: 'usernamePassword',
-              credentialsId: 'd73c882b-5ce2-44e9-a7e1-5549105624eb',
-              usernameVariable: 'credentialsUsername',
-              passwordVariable: 'credentialsPassword']]) {
-                def pushParameters = sprintf(
-                  'https://%1$s:%2$s@%3$s',
-                  [
-                    "${credentialsUsername}",
-                    "${credentialsPassword}",
-                    "github.com/chanahl/Common.Framework.git"
-                  ])
-                bat "git push ${pushParameters} --tags"
-              }
-          }
-        }
         failure {
           steps {
             script {
               currentBuild.result = 'FAILURE'
-              nunit = false
             }
           }
         }
@@ -119,6 +92,38 @@ pipeline {
         script {
           def sonarQube = tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'
           bat "${sonarQube}\\SonarQube.Scanner.MSBuild.exe end"
+        }
+      }
+    }
+    
+    stage('Tag') {
+      when {
+        currentBuild.result 'SUCCESS'
+      }
+      steps {
+        script {
+          def tagParameters = sprintf(
+            '-a %1$s -m "%2$s"',
+            [
+              gitVersionProperties.GitVersion_SemVer,
+              "Tagged created by Jenkins."
+            ])
+          bat "git tag ${tagParameters}"
+          
+          withCredentials([
+            usernamePassword(
+              credentialsId: 'd73c882b-5ce2-44e9-a7e1-5549105624eb',
+              passwordVariable: 'credentialsPassword',
+              usernameVariable: 'credentialsUsername')]) {
+            def pushParameters = sprintf(
+              'https://%1$s:%2$s@%3$s',
+              [
+                "${credentialsUsername}",
+                "${credentialsPassword}",
+                "github.com/chanahl/Common.Framework.git"
+              ])
+            bat "git push ${pushParameters} --tags"
+          }
         }
       }
     }
