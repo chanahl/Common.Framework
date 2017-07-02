@@ -2,6 +2,9 @@ pipeline {
   agent any
   
   environment {
+    gitUrl = 'git@github.com:chanahl/Common.Framework.git'
+    gitBranch = 'develop'
+    gitCredentialsId = '92df16ef-1ebd-4d46-bd70-09927dbb5f43'
     gitVersionProperties = null
     nunit = null
   }
@@ -25,9 +28,7 @@ pipeline {
     
     stage('SCM') {
       steps {
-        git(url: 'git@github.com:chanahl/Common.Framework.git',
-            branch: 'develop',
-            credentialsId: '92df16ef-1ebd-4d46-bd70-09927dbb5f43')
+        git(url: gitUrl, branch: gitBranch, credentialsId: gitCredentialsId)
       }
     }
     
@@ -60,7 +61,7 @@ pipeline {
           def sonarQubeParameters = sprintf(
             '/k:%1$s /n:%2$s /v:%3$s /d:sonar.host.url=%4$s',
               [
-                "${JOB_NAME}-" + gitVersionProperties.GitVersion_PreReleaseLabel,
+                "Common.Framework-" + gitVersionProperties.GitVersion_PreReleaseLabel,
                 "${JOB_BASE_NAME}",
                 gitVersionProperties.GitVersion_SemVer,
                 "http://desktop-nns09r8:8084"
