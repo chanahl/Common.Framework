@@ -52,6 +52,7 @@ pipeline {
   }
   
   environment {
+    config = null
     gitVersionProperties = null
     nunit = null
     nupkgsDirectory = '.nupkgs'
@@ -126,7 +127,7 @@ pipeline {
         script {
           def isFutureBranch = BRANCH_NAME.contains('/')
           def branch = isFutureBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
-          def config = configuration[branch] ? configuration[branch] : 'Debug'
+          config = configuration[branch] ? configuration[branch] : 'Debug'
           bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=${config} /p:Platform=\"Any CPU\""
         }
       }
@@ -164,7 +165,7 @@ pipeline {
               [
                 csProject,
                 nupkgsDirectory,
-                configuration,
+                config,
                 gitVersionProperties.GitVersion_SemVer
               ])
             bat "nuget pack ${packParameters}"
