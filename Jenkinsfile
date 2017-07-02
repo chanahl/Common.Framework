@@ -143,13 +143,13 @@ pipeline {
     success {
       emailext (
         attachLog: true,
-        body: "
+        body: '''
           <b>Result:</b> SUCCESS
           <br><br>
-          <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
+          <b>Version:</b> "${gitVersionProperties.GitVersion_SemVer}"
           <br><br>
           Check console output at ${BUILD_URL} to view the results.
-          <br>",
+          <br>''',
         mimeType: 'text/html',
         recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
         subject: '[JENKINS]: ${PROJECT_NAME}',
@@ -159,13 +159,13 @@ pipeline {
     failure {
       emailext (
         attachLog: true,
-        body: "
+        body: '''
           <b>Result:</b> FAILURE
           <br><br>
-          <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
+          <b>Version:</b> "${gitVersionProperties.GitVersion_SemVer}"
           <br><br>
           Check console output at ${BUILD_URL} to view the results.
-          <br>",
+          <br>''',
         mimeType: 'text/html',
         recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
         subject: '[JENKINS]: ${PROJECT_NAME}',
