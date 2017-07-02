@@ -126,13 +126,7 @@ pipeline {
       }
       steps {
         script {
-          def projects = [
-            "Common.Framework\\Common.Framework.Core\\Common.Framework.Core.csproj",
-            "Common.Framework\\Common.Framework.Data\\Common.Framework.Data.csproj",
-            "Common.Framework\\Common.Framework.Network\\Common.Framework.Network.csproj",
-            "Common.Framework\\Common.Framework.Utilities\\Common.Framework.Utilities.csproj"
-          ]
-          for (project in projects) {
+          for (project in nupkgProjects) {
             def packParameters = sprintf(
               '%1$s -Output %2$s -Properties Configuration="%3$s" -Symbols -IncludeReferencedProjects -Version %4$s',
               [
