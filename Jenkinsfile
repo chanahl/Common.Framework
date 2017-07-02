@@ -1,5 +1,7 @@
 pipeline {
-  agent any
+  agent node {
+    customWorkspace "D:\\.ws\\${ITEM_FULL_NAME}"
+  }
   
   environment {
     gitUrl = 'git@github.com:chanahl/Common.Framework.git'
