@@ -2,7 +2,7 @@ pipeline {
   agent {
     node {
       label 'master'
-      customWorkspace 'D:\\.ws\\ci\\Common.Framework'
+      customWorkspace "D:\\.ws\\ci\\Common.Framework-${BRANCH_NAME}".replaceAll('/', '-')
     }
   }
   
@@ -24,6 +24,17 @@ pipeline {
   }
   
   stages {
+    stage('Print Env') {
+      steps {
+        bat 'set > env.txt'
+        /*
+        for (String i : readFile('env.txt').split("\r?\n")) { 
+          println i
+        }
+        */
+      }
+    }
+    
     stage('Clean') {
       steps {
         deleteDir()
