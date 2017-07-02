@@ -62,7 +62,7 @@ pipeline {
             '/k:%1$s /n:%2$s /v:%3$s /d:sonar.host.url=%4$s',
               [
                 "Common.Framework-" + gitVersionProperties.GitVersion_PreReleaseLabel,
-                "${JOB_BASE_NAME}",
+                "Common.Framework-${JOB_BASE_NAME}",
                 gitVersionProperties.GitVersion_SemVer,
                 "http://desktop-nns09r8:8084"
               ])
@@ -131,20 +131,37 @@ pipeline {
   }
   
   post {
-    always {
+    success {
       emailext (
         attachLog: true,
         body: '''
-          <b>Jenkins Job:</b> ${PROJECT_NAME}
+          <b>Status:</b> SUCCESS
           <br>
-          <b>Build Status:</b> ${BUILD_STATUS}
+          <b>Branch:</b> ${gitBranch}
           <br>
-          <b>Build Number:</b> ${BUILD_NAME}
+          <b>GitVersion:</b> ${currentBuild.displayName}
           <br><br>
           Check console output at ${BUILD_URL} to view the results.
           <br>''',
         recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-        subject: '[JENKINS NOTIFY]: $PROJECT_NAME',
+        subject: '[JENKINS]: ${PROJECT_NAME}',
+        to: 'hlc.alex@gmail.com'
+      )
+    }
+    failure {
+      emailext (
+        attachLog: true,
+        body: '''
+          <b>Status:</b> FAILURE
+          <br>
+          <b>Branch:</b> ${gitBranch}
+          <br>
+          <b>GitVersion:</b> ${currentBuild.displayName}
+          <br><br>
+          Check console output at ${BUILD_URL} to view the results.
+          <br>''',
+        recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+        subject: '[JENKINS]: ${PROJECT_NAME}',
         to: 'hlc.alex@gmail.com'
       )
     }
