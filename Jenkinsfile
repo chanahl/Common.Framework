@@ -36,16 +36,9 @@ pipeline {
       }
     }
     
-    stage('NuGet Restore') {
-      steps {
-        bat '%NUGET_RESTORE_COMMAND% Common.Framework\\Common.Framework.sln'
-      }
-    }
-    
     stage('GitVersion') {
       steps {
         bat '%GITVERSION_EXE% /output buildserver /updateassemblyinfo .\\AssemblyInfo\\Common.Framework.AssemblyInfo.cs'
-        
         script {
           gitVersionProperties = new Properties()
           
@@ -58,9 +51,15 @@ pipeline {
       }
     }
     
+    stage('NuGet Restore') {
+      steps {
+        bat '%NUGET_RESTORE_COMMAND% Common.Framework\\Common.Framework.sln'
+      }
+    }
+    
     stage('SonarQube Begin') {
       when {
-        branch 'develop'
+        expression { BRANCH_NAME ==~ /(develop|master)/ }
       }
       steps {
         script {
@@ -82,7 +81,6 @@ pipeline {
       steps {
         bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=\"Debug\" /p:Platform=\"Any CPU\""
       }
-      
       post {
         failure {
           steps {
@@ -96,7 +94,7 @@ pipeline {
     
     stage('SonarQube End') {
       when {
-        branch 'develop'
+        expression { BRANCH_NAME ==~ /(develop|master)/ }
       }
       steps {
         script {
@@ -107,10 +105,8 @@ pipeline {
     
     stage('Tag') {
       when {
-        allOf {
-          branch 'develop'
-          environment name: 'currentBuild.result', value: ''
-        }
+        environment name: 'currentBuild.result', value: ''
+        expression { BRANCH_NAME ==~ /(develop|master)/ }
       }
       steps {
         script {
