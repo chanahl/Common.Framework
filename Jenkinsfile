@@ -1,14 +1,48 @@
 #!/bin/groovy
+/**
+ * Jenkinsfile (Declarative Pipeline)
+ */
 
-def gitRepositoryName = 'Common.Framework'
+def configuration = [
+  develop : 'Debug',
+  feature : 'Debug',
+  hotfix : 'Debug'
+  release : 'Release',
+  master : 'Release'
+]
 
-def nupkgProjects = [
+def csProjects = [
   "Common.Framework\\Common.Framework.Core\\Common.Framework.Core.csproj",
   "Common.Framework\\Common.Framework.Data\\Common.Framework.Data.csproj",
   "Common.Framework\\Common.Framework.Network\\Common.Framework.Network.csproj",
   "Common.Framework\\Common.Framework.Utilities\\Common.Framework.Utilities.csproj"
 ]
 
+def gitRepositoryName = 'Common.Framework'
+
+def nexus = [
+  develop : [
+    credentialsId : '22938cd7-52a5-44cb-be52-c77549a1caa6',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-prereleases-symbols/'],
+  feature : [
+    credentialsId : '22938cd7-52a5-44cb-be52-c77549a1caa6',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-prereleases-symbols/'],
+  hotfix : [
+    credentialsId : '3beb5157-0cc3-43a5-93eb-4de2c8a771af',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-releases-symbols/'],
+  release : [
+    credentialsId : '3beb5157-0cc3-43a5-93eb-4de2c8a771af',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-releases-symbols/'],
+  master : [
+    credentialsId : '3beb5157-0cc3-43a5-93eb-4de2c8a771af',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-releases-symbols/']
+]
+
+def sonarHostUrl = 'http://desktop-nns09r8:8084'
+
+/**
+ * Pipeline
+ */
 pipeline {
   agent {
     node {
@@ -20,14 +54,7 @@ pipeline {
   environment {
     gitVersionProperties = null
     nunit = null
-    
-    configuration = 'Debug'
-    
-    nexusRepositoryCredentialsId = '22938cd7-52a5-44cb-be52-c77549a1caa6'
-    nexusRepositoryUrl = 'http://desktop-nns09r8:8081/repository/nuget-private-prereleases-symbols/'
     nupkgsDirectory = '.nupkgs'
-    
-    sonarHostUrl = 'http://desktop-nns09r8:8084'
   }
   
   options {
@@ -96,7 +123,12 @@ pipeline {
     
     stage("Build") {
       steps {
-        bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=${configuration} /p:Platform=\"Any CPU\""
+        script {
+          def isFutureBranch = BRANCH_NAME.contains('/')
+          def branch = isFutureBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
+          def config = configuration[branch] ? configuration[branch] : 'Debug'
+          bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=${config} /p:Platform=\"Any CPU\""
+        }
       }
       post {
         failure {
@@ -126,11 +158,11 @@ pipeline {
       }
       steps {
         script {
-          for (project in nupkgProjects) {
+          for (csProject in csProjects) {
             def packParameters = sprintf(
               '%1$s -Output %2$s -Properties Configuration="%3$s" -Symbols -IncludeReferencedProjects -Version %4$s',
               [
-                project,
+                csProject,
                 nupkgsDirectory,
                 configuration,
                 gitVersionProperties.GitVersion_SemVer
@@ -144,16 +176,20 @@ pipeline {
     stage('Deploy') {
       when {
         environment name: 'currentBuild.result', value: ''
-        expression { BRANCH_NAME ==~ /(develop|master)/ }
       }
       steps {
         script {
           dir(nupkgsDirectory) {
+            def isFutureBranch = BRANCH_NAME.contains('/')
+            def branch = isFutureBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
+            def credentialsId = nexus[branch] ? nexus[branch]['credentialsId'] : ''
+            def url = nexus[branch] ? nexus[branch]['url'] : ''
+            
             withCredentials([
               string(
-                credentialsId: nexusRepositoryCredentialsId,
+                credentialsId: credentialsId,
                 variable: 'apiKey')]) {
-              bat "nuget push *.symbols.nupkg ${apiKey} -Source ${nexusRepositoryUrl}"
+              bat "nuget push *.symbols.nupkg ${apiKey} -Source ${url}"
             }
           }
         }
