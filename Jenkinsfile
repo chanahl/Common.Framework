@@ -2,7 +2,7 @@ pipeline {
   agent {
     node {
       label 'master'
-      customWorkspace 'D:\\.ws\\ci\\Common.Framework-${BRANCH_NAME}'
+      customWorkspace 'D:\\.ws\\ci\\Common.Framework'
     }
   }
   
