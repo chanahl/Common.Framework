@@ -10,6 +10,8 @@ pipeline {
     configuration = 'Debug'
     gitRepositoryName = 'Common.Framework'
     gitVersionProperties = null
+    nexusRepositoryApiKey = '29872fea-8ea4-32c1-95ec-61afbe98a6b7'
+    nexusRepositoryUrl = 'http://desktop-nns09r8:8081/repository/nuget-private-prereleases-symbols/'
     nunit = null
     nupkgsDirectory = '.nupkgs'
     sonarHostUrl = 'http://desktop-nns09r8:8084'
@@ -81,7 +83,7 @@ pipeline {
     
     stage("Build") {
       steps {
-        bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /t:Rebuild /p:Configuration=${configuration} /p:Platform=\"Any CPU\""
+        bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=${configuration} /p:Platform=\"Any CPU\""
       }
       post {
         failure {
@@ -127,6 +129,9 @@ pipeline {
                 gitVersionProperties.GitVersion_SemVer
               ])
             bat "nuget pack ${packParameters}"
+          }
+          dir(nupkgsDirectory) {
+            bat "nuget push *.symbols.nupkg ${nexusRepositoryApiKey} -Source ${nexusRepositoryUrl}"
           }
         }
       }
