@@ -1,3 +1,12 @@
+#!/bin/groovy
+
+def nupkgProjects = [
+  "Common.Framework\\Common.Framework.Core\\Common.Framework.Core.csproj",
+  "Common.Framework\\Common.Framework.Data\\Common.Framework.Data.csproj",
+  "Common.Framework\\Common.Framework.Network\\Common.Framework.Network.csproj",
+  "Common.Framework\\Common.Framework.Utilities\\Common.Framework.Utilities.csproj"
+]
+
 pipeline {
   agent {
     node {
@@ -17,12 +26,6 @@ pipeline {
     nexusRepositoryApiKey = '29872fea-8ea4-32c1-95ec-61afbe98a6b7'
     nexusRepositoryUrl = 'http://desktop-nns09r8:8081/repository/nuget-private-prereleases-symbols/'
     nupkgsDirectory = '.nupkgs'
-    nupkgProjects = [
-      "Common.Framework\\Common.Framework.Core\\Common.Framework.Core.csproj",
-      "Common.Framework\\Common.Framework.Data\\Common.Framework.Data.csproj",
-      "Common.Framework\\Common.Framework.Network\\Common.Framework.Network.csproj",
-      "Common.Framework\\Common.Framework.Utilities\\Common.Framework.Utilities.csproj"
-    ]
     
     sonarHostUrl = 'http://desktop-nns09r8:8084'
   }
