@@ -2,15 +2,15 @@ pipeline {
   agent {
     node {
       label 'master'
-      customWorkspace "D:\\.ws\\ci\\Common.Framework"
+      customWorkspace 'D:\\.ws\\ci\\Common.Framework-${BRANCH_NAME}'
     }
   }
   
   environment {
-    gitCredentialsId = '92df16ef-1ebd-4d46-bd70-09927dbb5f43'
-    gitUrl = 'git@github.com:chanahl/Common.Framework.git'
+    gitRepositoryName = 'Common.Framework'
     gitVersionProperties = null
     nunit = null
+    sonarHostUrl = 'http://desktop-nns09r8:8084'
   }
   
   options {
@@ -32,7 +32,6 @@ pipeline {
     
     stage('Checkout') {
       steps {
-        //git(url: gitUrl, credentialsId: gitCredentialsId)
         checkout scm
       }
     }
@@ -61,17 +60,17 @@ pipeline {
     
     stage('SonarQube Begin') {
       when {
-        environment name: 'BRANCH_NAME', value: 'develop'
+        branch 'develop'
       }
       steps {
         script {
           def sonarQubeParameters = sprintf(
             '/k:%1$s /n:%2$s /v:%3$s /d:sonar.host.url=%4$s',
               [
-                "Common.Framework-" + gitVersionProperties.GitVersion_PreReleaseLabel,
-                "Common.Framework-${JOB_BASE_NAME}",
+                gitRepositoryName + "-" + gitVersionProperties.GitVersion_PreReleaseLabel,
+                gitRepositoryName + "-" + gitVersionProperties.GitVersion_BranchName.replaceAll('/', '-'),
                 gitVersionProperties.GitVersion_SemVer,
-                "http://desktop-nns09r8:8084"
+                sonarHostUrl
               ])
               
           bat "${tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'} begin ${sonarQubeParameters}"
@@ -97,7 +96,7 @@ pipeline {
     
     stage('SonarQube End') {
       when {
-        environment name: 'BRANCH_NAME', value: 'develop'
+        branch 'develop'
       }
       steps {
         script {
@@ -108,7 +107,10 @@ pipeline {
     
     stage('Tag') {
       when {
-        environment name: 'currentBuild.result', value: ''
+        allOf {
+          branch 'develop'
+          environment name: 'currentBuild.result', value: ''
+        }
       }
       steps {
         script {
@@ -143,13 +145,13 @@ pipeline {
     success {
       emailext (
         attachLog: true,
-        body: '''
+        body: """
           <b>Result:</b> SUCCESS
           <br><br>
-          <b>Version:</b> "${gitVersionProperties.GitVersion_SemVer}"
+          <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
           <br><br>
           Check console output at ${BUILD_URL} to view the results.
-          <br>''',
+          <br>""",
         mimeType: 'text/html',
         recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
         subject: '[JENKINS]: ${PROJECT_NAME}',
@@ -159,13 +161,13 @@ pipeline {
     failure {
       emailext (
         attachLog: true,
-        body: '''
+        body: """
           <b>Result:</b> FAILURE
           <br><br>
-          <b>Version:</b> "${gitVersionProperties.GitVersion_SemVer}"
+          <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
           <br><br>
           Check console output at ${BUILD_URL} to view the results.
-          <br>''',
+          <br>""",
         mimeType: 'text/html',
         recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
         subject: '[JENKINS]: ${PROJECT_NAME}',
