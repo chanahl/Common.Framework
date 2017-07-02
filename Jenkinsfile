@@ -7,13 +7,23 @@ pipeline {
   }
   
   environment {
-    configuration = 'Debug'
-    gitRepositoryName = 'Common.Framework'
     gitVersionProperties = null
+    nunit = null
+    
+    configuration = 'Debug'
+    
+    gitRepositoryName = 'Common.Framework'
+    
     nexusRepositoryApiKey = '29872fea-8ea4-32c1-95ec-61afbe98a6b7'
     nexusRepositoryUrl = 'http://desktop-nns09r8:8081/repository/nuget-private-prereleases-symbols/'
-    nunit = null
     nupkgsDirectory = '.nupkgs'
+    nupkgProjects = [
+      "Common.Framework\\Common.Framework.Core\\Common.Framework.Core.csproj",
+      "Common.Framework\\Common.Framework.Data\\Common.Framework.Data.csproj",
+      "Common.Framework\\Common.Framework.Network\\Common.Framework.Network.csproj",
+      "Common.Framework\\Common.Framework.Utilities\\Common.Framework.Utilities.csproj"
+    ]
+    
     sonarHostUrl = 'http://desktop-nns09r8:8084'
   }
   
@@ -107,7 +117,7 @@ pipeline {
       }
     }
     
-    stage('NuGet Pack') {
+    stage('Pack') {
       when {
         environment name: 'currentBuild.result', value: ''
       }
@@ -130,6 +140,17 @@ pipeline {
               ])
             bat "nuget pack ${packParameters}"
           }
+        }
+      }
+    }
+    
+    stage('Deploy') {
+      when {
+        environment name: 'currentBuild.result', value: ''
+        expression { BRANCH_NAME ==~ /(develop|master)/ }
+      }
+      steps {
+        script {
           dir(nupkgsDirectory) {
             bat "nuget push *.symbols.nupkg ${nexusRepositoryApiKey} -Source ${nexusRepositoryUrl}"
           }
