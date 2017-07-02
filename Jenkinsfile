@@ -2,14 +2,13 @@ pipeline {
   agent {
     node {
       label 'master'
-      customWorkspace "D:\\.ws\\ci\\Common.Framework-develop"
+      customWorkspace "D:\\.ws\\ci\\Common.Framework"
     }
   }
   
   environment {
-    gitUrl = 'git@github.com:chanahl/Common.Framework.git'
-    gitBranch = 'develop'
     gitCredentialsId = '92df16ef-1ebd-4d46-bd70-09927dbb5f43'
+    gitUrl = 'git@github.com:chanahl/Common.Framework.git'
     gitVersionProperties = null
     nunit = null
   }
@@ -31,9 +30,10 @@ pipeline {
       }
     }
     
-    stage('SCM') {
+    stage('Checkout') {
       steps {
-        git(url: gitUrl, branch: gitBranch, credentialsId: gitCredentialsId)
+        //git(url: gitUrl, credentialsId: gitCredentialsId)
+        checkout scm
       }
     }
     
@@ -60,9 +60,11 @@ pipeline {
     }
     
     stage('SonarQube Begin') {
+      when {
+        environment name: 'BRANCH_NAME', value: 'develop'
+      }
       steps {
         script {
-          def sonarQube = tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'
           def sonarQubeParameters = sprintf(
             '/k:%1$s /n:%2$s /v:%3$s /d:sonar.host.url=%4$s',
               [
@@ -72,7 +74,7 @@ pipeline {
                 "http://desktop-nns09r8:8084"
               ])
               
-          bat "${sonarQube}\\SonarQube.Scanner.MSBuild.exe begin ${sonarQubeParameters}"
+          bat "${tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'} begin ${sonarQubeParameters}"
         }
       }
     }
@@ -94,10 +96,12 @@ pipeline {
     }
     
     stage('SonarQube End') {
+      when {
+        environment name: 'BRANCH_NAME', value: 'develop'
+      }
       steps {
         script {
-          def sonarQube = tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'
-          bat "${sonarQube}\\SonarQube.Scanner.MSBuild.exe end"
+          bat "${tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'} end"
         }
       }
     }
@@ -139,11 +143,13 @@ pipeline {
     success {
       emailext (
         attachLog: true,
-        body: '''
+        body: "
           <b>Result:</b> SUCCESS
           <br><br>
+          <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
+          <br><br>
           Check console output at ${BUILD_URL} to view the results.
-          <br>''',
+          <br>",
         mimeType: 'text/html',
         recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
         subject: '[JENKINS]: ${PROJECT_NAME}',
@@ -153,11 +159,13 @@ pipeline {
     failure {
       emailext (
         attachLog: true,
-        body: '''
+        body: "
           <b>Result:</b> FAILURE
           <br><br>
+          <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
+          <br><br>
           Check console output at ${BUILD_URL} to view the results.
-          <br>''',
+          <br>",
         mimeType: 'text/html',
         recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
         subject: '[JENKINS]: ${PROJECT_NAME}',
