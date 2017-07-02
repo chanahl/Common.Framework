@@ -23,7 +23,7 @@ pipeline {
     
     gitRepositoryName = 'Common.Framework'
     
-    nexusRepositoryApiKey = '29872fea-8ea4-32c1-95ec-61afbe98a6b7'
+    nexusRepositoryCredentialsId = '22938cd7-52a5-44cb-be52-c77549a1caa6'
     nexusRepositoryUrl = 'http://desktop-nns09r8:8081/repository/nuget-private-prereleases-symbols/'
     nupkgsDirectory = '.nupkgs'
     
@@ -149,7 +149,12 @@ pipeline {
       steps {
         script {
           dir(nupkgsDirectory) {
-            bat "nuget push *.symbols.nupkg ${nexusRepositoryApiKey} -Source ${nexusRepositoryUrl}"
+            withCredentials([
+              string(
+                credentialsId: nexusRepositoryCredentialsId,
+                variable: 'apiKey')]) {
+              bat "nuget push *.symbols.nupkg ${apiKey} -Source ${nexusRepositoryUrl}"
+            }
           }
         }
       }
