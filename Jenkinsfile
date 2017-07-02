@@ -36,6 +36,10 @@ pipeline {
     timestamps()
   }
   
+  triggers {
+    pollSCM('')
+  }
+  
   stages {    
     stage('Clean') {
       steps {
