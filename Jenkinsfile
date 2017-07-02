@@ -7,9 +7,11 @@ pipeline {
   }
   
   environment {
+    configuration = 'Debug'
     gitRepositoryName = 'Common.Framework'
     gitVersionProperties = null
     nunit = null
+    nupkgsDirectory = '.nupkgs'
     sonarHostUrl = 'http://desktop-nns09r8:8084'
   }
   
@@ -79,7 +81,7 @@ pipeline {
     
     stage("Build") {
       steps {
-        bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=\"Debug\" /p:Platform=\"Any CPU\""
+        bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=${configuration} /p:Platform=\"Any CPU\""
       }
       post {
         failure {
@@ -99,6 +101,29 @@ pipeline {
       steps {
         script {
           bat "${tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'} end"
+        }
+      }
+    }
+    
+    stage('NuGet Pack') {
+      steps {
+        script {
+          def projects = [
+            "Common.Framework\\Common.Framework.Core\\Common.Framework.Core.csproj",
+            "Common.Framework\\Common.Framework.Data\\Common.Framework.Data.csproj",
+            "Common.Framework\\Common.Framework.Network\\Common.Framework.Network.csproj",
+            "Common.Framework\\Common.Framework.Utilities\\Common.Framework.Utilities.csproj"
+          ]
+          for (project in projects) {
+            def packParameters = sprintf(
+              '%1$s -Output %2$s -Properties Configuration="%3$s" -Symbols -IncludeReferencedProjects',
+              [
+                project,
+                nupkgsDirectory,
+                configuration
+              ])
+            bat "nuget pack ${packParameters}"
+          }
         }
       }
     }
