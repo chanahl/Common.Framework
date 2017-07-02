@@ -106,6 +106,9 @@ pipeline {
     }
     
     stage('NuGet Pack') {
+      when {
+        environment name: 'currentBuild.result', value: ''
+      }
       steps {
         script {
           def projects = [
@@ -116,11 +119,12 @@ pipeline {
           ]
           for (project in projects) {
             def packParameters = sprintf(
-              '%1$s -Output %2$s -Properties Configuration="%3$s" -Symbols -IncludeReferencedProjects',
+              '%1$s -Output %2$s -Properties Configuration="%3$s" -Symbols -IncludeReferencedProjects -Version %4$s',
               [
                 project,
                 nupkgsDirectory,
-                configuration
+                configuration,
+                gitVersionProperties.GitVersion_SemVer
               ])
             bat "nuget pack ${packParameters}"
           }
