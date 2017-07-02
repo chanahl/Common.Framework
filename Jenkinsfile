@@ -27,8 +27,10 @@ pipeline {
     stage('Print Env') {
       steps {
         bat 'set > env.txt'
-        for (String i : readFile('env.txt').split("\r?\n")) { 
-          println i
+        script {
+          for (String i : readFile('env.txt').split("\r?\n")) {
+            println i
+          }
         }
       }
     }
