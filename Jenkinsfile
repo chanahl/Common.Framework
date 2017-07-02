@@ -81,7 +81,7 @@ pipeline {
     
     stage("Build") {
       steps {
-        bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=${configuration} /p:Platform=\"Any CPU\""
+        bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /t:Rebuild /p:Configuration=${configuration} /p:Platform=\"Any CPU\""
       }
       post {
         failure {
