@@ -6,7 +6,7 @@
 def configuration = [
   develop : 'Debug',
   feature : 'Debug',
-  hotfix : 'Debug'
+  hotfix : 'Debug',
   release : 'Release',
   master : 'Release'
 ]
