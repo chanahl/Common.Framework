@@ -135,11 +135,11 @@ pipeline {
       emailext (
         attachLog: true,
         body: '''
-          <b>Status:</b> SUCCESS
+          <b>Result:</b> SUCCESS
           <br>
-          <b>Branch:</b> ${gitBranch}
+          <b>Branch:</b> "${gitBranch}"
           <br>
-          <b>GitVersion:</b> ${currentBuild.displayName}
+          <b>Tag:</b> "${currentBuild.displayName}"
           <br><br>
           Check console output at ${BUILD_URL} to view the results.
           <br>''',
@@ -152,11 +152,11 @@ pipeline {
       emailext (
         attachLog: true,
         body: '''
-          <b>Status:</b> FAILURE
+          <b>Result:</b> FAILURE
           <br>
-          <b>Branch:</b> ${gitBranch}
+          <b>Branch:</b> "${gitBranch}"
           <br>
-          <b>GitVersion:</b> ${currentBuild.displayName}
+          <b>Tag:</b> "${currentBuild.displayName}"
           <br><br>
           Check console output at ${BUILD_URL} to view the results.
           <br>''',
