@@ -1,5 +1,5 @@
 pipeline {
-  agent node {
+  agent any {
     customWorkspace "D:\\.ws\\${ITEM_FULL_NAME}"
   }
   
