@@ -23,18 +23,7 @@ pipeline {
     pollSCM('H/5 * * * *')
   }
   
-  stages {
-    stage('Print Env') {
-      steps {
-        bat 'set > env.txt'
-        script {
-          for (String i : readFile('env.txt').split("\r?\n")) {
-            println i
-          }
-        }
-      }
-    }
-    
+  stages {    
     stage('Clean') {
       steps {
         deleteDir()
@@ -153,6 +142,9 @@ pipeline {
   }
   
   post {
+    always {
+      bat 'set > env.out'
+    }
     success {
       emailext (
         attachLog: true,
