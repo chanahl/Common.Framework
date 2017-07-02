@@ -136,13 +136,10 @@ pipeline {
         attachLog: true,
         body: '''
           <b>Result:</b> SUCCESS
-          <br>
-          <b>Branch:</b> "${gitBranch}"
-          <br>
-          <b>Tag:</b> "${currentBuild.displayName}"
           <br><br>
           Check console output at ${BUILD_URL} to view the results.
           <br>''',
+        mimeType: 'text/html',
         recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
         subject: '[JENKINS]: ${PROJECT_NAME}',
         to: 'hlc.alex@gmail.com'
@@ -153,13 +150,10 @@ pipeline {
         attachLog: true,
         body: '''
           <b>Result:</b> FAILURE
-          <br>
-          <b>Branch:</b> "${gitBranch}"
-          <br>
-          <b>Tag:</b> "${currentBuild.displayName}"
           <br><br>
           Check console output at ${BUILD_URL} to view the results.
           <br>''',
+        mimeType: 'text/html',
         recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
         subject: '[JENKINS]: ${PROJECT_NAME}',
         to: 'hlc.alex@gmail.com'
