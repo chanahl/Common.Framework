@@ -133,10 +133,19 @@ pipeline {
   post {
     always {
       emailext (
-        subject: "${currentBuild.result}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-        body: """<p>${currentBuild.result}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
-                <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
-        to: "${DEFAULT_RECIPIENTS}"
+        attachLog: true,
+        body: '''
+          <b>Jenkins Job:</b> ${PROJECT_NAME}
+          <br>
+          <b>Build Status:</b> ${BUILD_STATUS}
+          <br>
+          <b>Build Number:</b> ${BUILD_NAME}
+          <br><br>
+          Check console output at ${BUILD_URL} to view the results.
+          <br>''',
+        recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+        subject: '[JENKINS NOTIFY]: $PROJECT_NAME',
+        to: 'hlc.alex@gmail.com'
       )
     }
   }
