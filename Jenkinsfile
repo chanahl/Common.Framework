@@ -112,7 +112,7 @@ pipeline {
             '-a %1$s -m "%2$s"',
             [
               gitVersionProperties.GitVersion_SemVer,
-              "Tagged created by Jenkins."
+              "Tag created by Jenkins."
             ])
           bat "git tag ${tagParameters}"
           
