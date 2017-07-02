@@ -2,7 +2,7 @@ pipeline {
   agent {
     node {
       label 'master'
-      customWorkspace "D:\\.ws\\${ITEM_FULL_NAME}"
+      customWorkspace "D:\\.ws\\${env.ITEM_FULL_NAME}"
     }
   }
   
