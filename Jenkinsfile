@@ -1,5 +1,7 @@
 #!/bin/groovy
 
+def gitRepositoryName = 'Common.Framework'
+
 def nupkgProjects = [
   "Common.Framework\\Common.Framework.Core\\Common.Framework.Core.csproj",
   "Common.Framework\\Common.Framework.Data\\Common.Framework.Data.csproj",
@@ -11,7 +13,7 @@ pipeline {
   agent {
     node {
       label 'master'
-      customWorkspace "D:\\.ws\\ci\\Common.Framework-${BRANCH_NAME}".replaceAll('/', '-')
+      customWorkspace "D:\\.ws\\ci\\${gitRepositoryName}-${BRANCH_NAME}".replaceAll('/', '-')
     }
   }
   
@@ -20,8 +22,6 @@ pipeline {
     nunit = null
     
     configuration = 'Debug'
-    
-    gitRepositoryName = 'Common.Framework'
     
     nexusRepositoryCredentialsId = '22938cd7-52a5-44cb-be52-c77549a1caa6'
     nexusRepositoryUrl = 'http://desktop-nns09r8:8081/repository/nuget-private-prereleases-symbols/'
