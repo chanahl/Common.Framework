@@ -221,7 +221,7 @@ pipeline {
               gitVersionProperties.GitVersion_SemVer,
               "Tag created by Jenkins."
             ])
-          bat "${tool name: 'gitversion-4.0.0-beta.12', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} tag ${tagParameters}"
+          bat "${tool name: '2.12.1.windows.1', type: 'git'} tag ${tagParameters}"
           
           withCredentials([
             usernamePassword(
@@ -235,7 +235,7 @@ pipeline {
                 "${credentialsPassword}",
                 "github.com/chanahl/Common.Framework.git"
               ])
-            bat "${tool name: 'gitversion-4.0.0-beta.12', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} push ${pushParameters} --tags"
+            bat "${tool name: '2.12.1.windows.1', type: 'git'} push ${pushParameters} --tags"
           }
         }
       }
