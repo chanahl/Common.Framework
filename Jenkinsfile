@@ -6,8 +6,8 @@
 def configuration = [
   develop : 'Debug',
   feature : 'Debug',
-  hotfix : 'Debug',
   release : 'Release',
+  hotfix : 'Release',
   master : 'Release'
 ]
 
@@ -22,20 +22,20 @@ def gitRepositoryName = 'Common.Framework'
 
 def nexus = [
   develop : [
-    credentialsId : '22938cd7-52a5-44cb-be52-c77549a1caa6',
-    url : 'http://desktop-nns09r8:8081/repository/nuget-private-prereleases-symbols/'],
+    credentialsId : '383c6d87-4ad7-405f-a4c3-3029c76c2818',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-develop/'],
   feature : [
-    credentialsId : '22938cd7-52a5-44cb-be52-c77549a1caa6',
-    url : 'http://desktop-nns09r8:8081/repository/nuget-private-prereleases-symbols/'],
-  hotfix : [
-    credentialsId : '3beb5157-0cc3-43a5-93eb-4de2c8a771af',
-    url : 'http://desktop-nns09r8:8081/repository/nuget-private-releases-symbols/'],
+    credentialsId : '383c6d87-4ad7-405f-a4c3-3029c76c2818',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-feature/'],
   release : [
-    credentialsId : '3beb5157-0cc3-43a5-93eb-4de2c8a771af',
-    url : 'http://desktop-nns09r8:8081/repository/nuget-private-releases-symbols/'],
+    credentialsId : 'de4641c2-8352-40d9-8eae-fa1934f3cafc',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-release/'],
+  hotfix : [
+    credentialsId : 'de4641c2-8352-40d9-8eae-fa1934f3cafc',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-hotfix/'],
   master : [
-    credentialsId : '3beb5157-0cc3-43a5-93eb-4de2c8a771af',
-    url : 'http://desktop-nns09r8:8081/repository/nuget-private-releases-symbols/']
+    credentialsId : 'de4641c2-8352-40d9-8eae-fa1934f3cafc',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-master/']
 ]
 
 def sonarHostUrl = 'http://desktop-nns09r8:8084'
