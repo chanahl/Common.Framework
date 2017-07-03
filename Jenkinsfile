@@ -70,11 +70,7 @@ pipeline {
   }
   
   tools {
-    //com.cloudbees.jenkins.plugins.customtools.CustomTool "gitversion-4.0.0-beta.12"
-    //com.cloudbees.jenkins.plugins.customtools.CustomTool "nuget-4.1.0"
     git "2.12.1.windows.1"
-    //hudson.plugins.sonar.MsBuildSQRunnerInstallation "sonar-scanner-msbuild-3.0.0.629"
-    msbuild "msbuild-14.0"
   }
   
   triggers {
@@ -141,8 +137,7 @@ pipeline {
           def isFutureBranch = BRANCH_NAME.contains('/')
           def branch = isFutureBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
           config = _configuration[branch] ? _configuration[branch] : 'Debug'
-          //bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=${config} /p:Platform=\"Any CPU\""
-          bat "MSBuild.exe Common.Framework\\Common.Framework.sln /p:Configuration=${config} /p:Platform=\"Any CPU\""
+          bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=${config} /p:Platform=\"Any CPU\""
         }
       }
       post {
