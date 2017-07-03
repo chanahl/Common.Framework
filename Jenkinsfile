@@ -73,7 +73,8 @@ pipeline {
     //com.cloudbees.jenkins.plugins.customtools.CustomTool "gitversion-4.0.0-beta.12"
     //com.cloudbees.jenkins.plugins.customtools.CustomTool "nuget-4.1.0"
     git "2.12.1.windows.1"
-    hudson.plugins.sonar.MsBuildSQRunnerInstallation "sonar-scanner-msbuild-3.0.0.629"
+    //hudson.plugins.sonar.MsBuildSQRunnerInstallation "sonar-scanner-msbuild-3.0.0.629"
+    MsBuildSQRunnerInstallation "sonar-scanner-msbuild-3.0.0.629"
     msbuild "msbuild-14.0"
   }
   
