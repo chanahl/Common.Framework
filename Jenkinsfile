@@ -69,6 +69,14 @@ pipeline {
     timestamps()
   }
   
+  tools {
+    com.cloudbees.jenkins.plugins.customtools.CustomTool "gitversion-4.0.0-beta.12"
+    com.cloudbees.jenkins.plugins.customtools.CustomTool "nuget-4.1.0"
+    git "2.12.1.windows.1"
+    hudson.plugins.sonar.MsBuildSQRunnerInstallation "sonar-scanner-msbuild-3.0.0.629"
+    msbuild "msbuild-14.0"
+  }
+  
   triggers {
     pollSCM('H/5 * * * *')
   }
@@ -103,7 +111,7 @@ pipeline {
     
     stage('NuGet Restore') {
       steps {
-        bat '%NUGET_RESTORE_COMMAND% Common.Framework\\Common.Framework.sln'
+        bat "${tool name: 'nuget-4.1.0', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} Restore -ConfigFile %NUGET_CONFIG% -NonInteractive Common.Framework\\Common.Framework.sln"
       }
     }
     
