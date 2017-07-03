@@ -1,17 +1,72 @@
+#!/bin/groovy
+/**
+ * Global Variables: https://issues.jenkins-ci.org/browse/JENKINS-41335
+ */
+
+// Map[GitFlow Branch : Build Configuration].
+def _configuration = [
+  develop : 'Debug',
+  feature : 'Debug',
+  release : 'Release',
+  hotfix : 'Release',
+  master : 'Release'
+]
+
+// List[.csproj]: Projects expected to produce an asset (.nupkg) on successful build.  Path is relative to workspace.
+def _csProjects = [
+  "Common.Framework\\Common.Framework.Core\\Common.Framework.Core.csproj",
+  "Common.Framework\\Common.Framework.Data\\Common.Framework.Data.csproj",
+  "Common.Framework\\Common.Framework.Network\\Common.Framework.Network.csproj",
+  "Common.Framework\\Common.Framework.Utilities\\Common.Framework.Utilities.csproj"
+]
+
+// String: Custom workspace directory.
+def _customWorkspace = 'D:\\.ws\\ci'
+
+// String: Git repository name.
+def _gitRepositoryName = 'Common.Framework'
+
+// Map[GitFlow Branch : [Jenkins CredentialsId (API Key), Nexus URL ]].
+def _nexus = [
+  develop : [
+    credentialsId : '383c6d87-4ad7-405f-a4c3-3029c76c2818',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-develop/'],
+  feature : [
+    credentialsId : '383c6d87-4ad7-405f-a4c3-3029c76c2818',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-feature/'],
+  release : [
+    credentialsId : 'de4641c2-8352-40d9-8eae-fa1934f3cafc',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-release/'],
+  hotfix : [
+    credentialsId : 'de4641c2-8352-40d9-8eae-fa1934f3cafc',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-hotfix/'],
+  master : [
+    credentialsId : 'de4641c2-8352-40d9-8eae-fa1934f3cafc',
+    url : 'http://desktop-nns09r8:8081/repository/nuget-private-master/']
+]
+
+// String: NuGet.config
+def _nugetConfig = 'D:\\.devops\\.nuget\\nuget.config'
+
+// String: SonarQube host URL.
+def _sonarHostUrl = 'http://desktop-nns09r8:8084'
+
+/**
+ * Jenkinsfile (Declarative Pipeline)
+ */
 pipeline {
   agent {
     node {
       label 'master'
-      customWorkspace "D:\\.ws\\ci\\Common.Framework-develop"
+      customWorkspace "${_customWorkspace}\\${_gitRepositoryName}-${BRANCH_NAME}".replaceAll('/', '-')
     }
   }
   
   environment {
-    gitUrl = 'git@github.com:chanahl/Common.Framework.git'
-    gitBranch = 'develop'
-    gitCredentialsId = '92df16ef-1ebd-4d46-bd70-09927dbb5f43'
+    config = null
     gitVersionProperties = null
     nunit = null
+    nupkgsDirectory = '.nupkgs'
   }
   
   options {
@@ -24,29 +79,22 @@ pipeline {
     pollSCM('H/5 * * * *')
   }
   
-  stages {
+  stages {    
     stage('Clean') {
       steps {
         deleteDir()
       }
     }
     
-    stage('SCM') {
+    stage('Checkout') {
       steps {
-        git(url: gitUrl, branch: gitBranch, credentialsId: gitCredentialsId)
-      }
-    }
-    
-    stage('NuGet Restore') {
-      steps {
-        bat '%NUGET_RESTORE_COMMAND% Common.Framework\\Common.Framework.sln'
+        checkout scm
       }
     }
     
     stage('GitVersion') {
       steps {
-        bat '%GITVERSION_EXE% /output buildserver /updateassemblyinfo .\\AssemblyInfo\\Common.Framework.AssemblyInfo.cs'
-        
+        bat "${tool name: 'gitversion-4.0.0-beta.12', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} /output buildserver /updateassemblyinfo .\\AssemblyInfo\\Common.Framework.AssemblyInfo.cs"
         script {
           gitVersionProperties = new Properties()
           
@@ -59,29 +107,41 @@ pipeline {
       }
     }
     
+    stage('NuGet Restore') {
+      steps {
+        bat "${tool name: 'nuget-4.1.0', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} Restore -ConfigFile ${_nugetConfig} -NonInteractive Common.Framework\\Common.Framework.sln"
+      }
+    }
+    
     stage('SonarQube Begin') {
+      when {
+        expression { BRANCH_NAME ==~ /(develop|master)/ }
+      }
       steps {
         script {
-          def sonarQube = tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'
           def sonarQubeParameters = sprintf(
             '/k:%1$s /n:%2$s /v:%3$s /d:sonar.host.url=%4$s',
               [
-                "Common.Framework-" + gitVersionProperties.GitVersion_PreReleaseLabel,
-                "Common.Framework-${JOB_BASE_NAME}",
+                _gitRepositoryName + "-" + gitVersionProperties.GitVersion_PreReleaseLabel,
+                _gitRepositoryName + "-" + gitVersionProperties.GitVersion_BranchName.replaceAll('/', '-'),
                 gitVersionProperties.GitVersion_SemVer,
-                "http://desktop-nns09r8:8084"
+                _sonarHostUrl
               ])
               
-          bat "${sonarQube}\\SonarQube.Scanner.MSBuild.exe begin ${sonarQubeParameters}"
+          bat "${tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'} begin ${sonarQubeParameters}"
         }
       }
     }
     
     stage("Build") {
       steps {
-        bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=\"Debug\" /p:Platform=\"Any CPU\""
+        script {
+          def isFutureBranch = BRANCH_NAME.contains('/')
+          def branch = isFutureBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
+          config = _configuration[branch] ? _configuration[branch] : 'Debug'
+          bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=${config} /p:Platform=\"Any CPU\""
+        }
       }
-      
       post {
         failure {
           steps {
@@ -94,10 +154,56 @@ pipeline {
     }
     
     stage('SonarQube End') {
+      when {
+        expression { BRANCH_NAME ==~ /(develop|master)/ }
+      }
       steps {
         script {
-          def sonarQube = tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'
-          bat "${sonarQube}\\SonarQube.Scanner.MSBuild.exe end"
+          bat "${tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'} end"
+        }
+      }
+    }
+    
+    stage('Pack') {
+      when {
+        environment name: 'currentBuild.result', value: ''
+      }
+      steps {
+        script {
+          for (csProject in _csProjects) {
+            def packParameters = sprintf(
+              '%1$s -Output %2$s -Properties Configuration="%3$s" -Symbols -IncludeReferencedProjects -Version %4$s',
+              [
+                csProject,
+                nupkgsDirectory,
+                config,
+                gitVersionProperties.GitVersion_SemVer
+              ])
+            bat "${tool name: 'nuget-4.1.0', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} pack ${packParameters}"
+          }
+        }
+      }
+    }
+    
+    stage('Deploy') {
+      when {
+        environment name: 'currentBuild.result', value: ''
+      }
+      steps {
+        script {
+          dir(nupkgsDirectory) {
+            def isFutureBranch = BRANCH_NAME.contains('/')
+            def branch = isFutureBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
+            def credentialsId = _nexus[branch] ? _nexus[branch]['credentialsId'] : ''
+            def url = _nexus[branch] ? _nexus[branch]['url'] : ''
+            
+            withCredentials([
+              string(
+                credentialsId: credentialsId,
+                variable: 'apiKey')]) {
+              bat "${tool name: 'nuget-4.1.0', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} push *.symbols.nupkg ${apiKey} -Source ${url}"
+            }
+          }
         }
       }
     }
@@ -105,6 +211,7 @@ pipeline {
     stage('Tag') {
       when {
         environment name: 'currentBuild.result', value: ''
+        expression { BRANCH_NAME ==~ /(develop|master)/ }
       }
       steps {
         script {
@@ -114,7 +221,7 @@ pipeline {
               gitVersionProperties.GitVersion_SemVer,
               "Tag created by Jenkins."
             ])
-          bat "git tag ${tagParameters}"
+          bat "${tool name: 'gitversion-4.0.0-beta.12', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} tag ${tagParameters}"
           
           withCredentials([
             usernamePassword(
@@ -128,7 +235,7 @@ pipeline {
                 "${credentialsPassword}",
                 "github.com/chanahl/Common.Framework.git"
               ])
-            bat "git push ${pushParameters} --tags"
+            bat "${tool name: 'gitversion-4.0.0-beta.12', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} push ${pushParameters} --tags"
           }
         }
       }
@@ -136,14 +243,19 @@ pipeline {
   }
   
   post {
+    always {
+      bat 'set > env.out'
+    }
     success {
       emailext (
         attachLog: true,
-        body: '''
+        body: """
           <b>Result:</b> SUCCESS
           <br><br>
+          <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
+          <br><br>
           Check console output at ${BUILD_URL} to view the results.
-          <br>''',
+          <br>""",
         mimeType: 'text/html',
         recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
         subject: '[JENKINS]: ${PROJECT_NAME}',
@@ -153,11 +265,13 @@ pipeline {
     failure {
       emailext (
         attachLog: true,
-        body: '''
+        body: """
           <b>Result:</b> FAILURE
           <br><br>
+          <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
+          <br><br>
           Check console output at ${BUILD_URL} to view the results.
-          <br>''',
+          <br>""",
         mimeType: 'text/html',
         recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
         subject: '[JENKINS]: ${PROJECT_NAME}',

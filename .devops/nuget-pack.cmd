@@ -40,19 +40,19 @@ CALL :Finish
 
 :: == nupkg ===================================================================
 :Common.Framework.Core
-SET projectPath="%base%Common.Framework.Core\Common.Framework.Core.csproj"
+SET projectPath="%base%Common.Framework\Common.Framework.Core\Common.Framework.Core.csproj"
 GOTO :EOF
 
 :Common.Framework.Data
-SET projectPath="%base%Common.Framework.Data\Common.Framework.Data.csproj"
+SET projectPath="%base%Common.Framework\Common.Framework.Data\Common.Framework.Data.csproj"
 GOTO :EOF
 
 :Common.Framework.Network
-SET projectPath="%base%Common.Framework.Network\Common.Framework.Network.csproj"
+SET projectPath="%base%Common.Framework\Common.Framework.Network\Common.Framework.Network.csproj"
 GOTO :EOF
 
 :Common.Framework.Utilities
-SET projectPath="%base%Common.Framework.Utilities\Common.Framework.Utilities.csproj"
+SET projectPath="%base%Common.Framework\Common.Framework.Utilities\Common.Framework.Utilities.csproj"
 GOTO :EOF
 :: ============================================================================
 
