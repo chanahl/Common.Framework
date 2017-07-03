@@ -1,6 +1,6 @@
 #!/bin/groovy
 /**
- * Jenkinsfile (Declarative Pipeline)
+ * Global Variables: https://issues.jenkins-ci.org/browse/JENKINS-41335
  */
 
 // Map[GitFlow Branch : Build Configuration].
@@ -42,11 +42,14 @@ def _nexus = [
     url : 'http://desktop-nns09r8:8081/repository/nuget-private-master/']
 ]
 
+// String: NuGet.config
+def _nugetConfig = 'D:\\.devops\\.nuget\\nuget.config'
+
 // String: SonarQube host URL.
 def _sonarHostUrl = 'http://desktop-nns09r8:8084'
 
 /**
- * Pipeline
+ * Jenkinsfile (Declarative Pipeline)
  */
 pipeline {
   agent {
@@ -67,10 +70,6 @@ pipeline {
     buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
     disableConcurrentBuilds()
     timestamps()
-  }
-  
-  tools {
-    git "2.12.1.windows.1"
   }
   
   triggers {
@@ -107,7 +106,7 @@ pipeline {
     
     stage('NuGet Restore') {
       steps {
-        bat "${tool name: 'nuget-4.1.0', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} Restore -ConfigFile %NUGET_CONFIG% -NonInteractive Common.Framework\\Common.Framework.sln"
+        bat "${tool name: 'nuget-4.1.0', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} Restore -ConfigFile ${_nugetConfig} -NonInteractive Common.Framework\\Common.Framework.sln"
       }
     }
     
@@ -177,7 +176,7 @@ pipeline {
                 config,
                 gitVersionProperties.GitVersion_SemVer
               ])
-            bat "nuget pack ${packParameters}"
+            bat "${tool name: 'nuget-4.1.0', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} pack ${packParameters}"
           }
         }
       }
@@ -199,7 +198,7 @@ pipeline {
               string(
                 credentialsId: credentialsId,
                 variable: 'apiKey')]) {
-              bat "nuget push *.symbols.nupkg ${apiKey} -Source ${url}"
+              bat "${tool name: 'nuget-4.1.0', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} push *.symbols.nupkg ${apiKey} -Source ${url}"
             }
           }
         }
@@ -219,7 +218,7 @@ pipeline {
               gitVersionProperties.GitVersion_SemVer,
               "Tag created by Jenkins."
             ])
-          bat "git tag ${tagParameters}"
+          bat "${tool name: 'gitversion-4.0.0-beta.12', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} tag ${tagParameters}"
           
           withCredentials([
             usernamePassword(
@@ -233,7 +232,7 @@ pipeline {
                 "${credentialsPassword}",
                 "github.com/chanahl/Common.Framework.git"
               ])
-            bat "git push ${pushParameters} --tags"
+            bat "${tool name: 'gitversion-4.0.0-beta.12', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} push ${pushParameters} --tags"
           }
         }
       }
