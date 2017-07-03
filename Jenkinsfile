@@ -20,6 +20,9 @@ def _csProjects = [
   "Common.Framework\\Common.Framework.Utilities\\Common.Framework.Utilities.csproj"
 ]
 
+// String: Custom workspace directory.
+def _customWorkspace = 'D:\\.ws\\ci'
+
 // String: Git repository name.
 def _gitRepositoryName = 'Common.Framework'
 
@@ -55,7 +58,7 @@ pipeline {
   agent {
     node {
       label 'master'
-      customWorkspace "D:\\.ws\\ci\\${_gitRepositoryName}-${BRANCH_NAME}".replaceAll('/', '-')
+      customWorkspace "${_customWorkspace}\\${_gitRepositoryName}-${BRANCH_NAME}".replaceAll('/', '-')
     }
   }
   
