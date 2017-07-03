@@ -142,7 +142,7 @@ pipeline {
           def branch = isFutureBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
           config = _configuration[branch] ? _configuration[branch] : 'Debug'
           //bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=${config} /p:Platform=\"Any CPU\""
-          bat "MSBuild Common.Framework\\Common.Framework.sln /p:Configuration=${config} /p:Platform=\"Any CPU\""
+          bat "MSBuild.exe Common.Framework\\Common.Framework.sln /p:Configuration=${config} /p:Platform=\"Any CPU\""
         }
       }
       post {
