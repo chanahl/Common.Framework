@@ -3,7 +3,8 @@
  * Jenkinsfile (Declarative Pipeline)
  */
 
-def configuration = [
+// Map[GitFlow Branch : Build Configuration].
+def _configuration = [
   develop : 'Debug',
   feature : 'Debug',
   release : 'Release',
@@ -11,16 +12,19 @@ def configuration = [
   master : 'Release'
 ]
 
-def csProjects = [
+// List[.csproj]: Projects expected to produce an asset (.nupkg) on successful build.  Path is relative to workspace.
+def _csProjects = [
   "Common.Framework\\Common.Framework.Core\\Common.Framework.Core.csproj",
   "Common.Framework\\Common.Framework.Data\\Common.Framework.Data.csproj",
   "Common.Framework\\Common.Framework.Network\\Common.Framework.Network.csproj",
   "Common.Framework\\Common.Framework.Utilities\\Common.Framework.Utilities.csproj"
 ]
 
-def gitRepositoryName = 'Common.Framework'
+// String: Git repository name.
+def _gitRepositoryName = 'Common.Framework'
 
-def nexus = [
+// Map[GitFlow Branch : [Jenkins CredentialsId (API Key), Nexus URL ]].
+def _nexus = [
   develop : [
     credentialsId : '383c6d87-4ad7-405f-a4c3-3029c76c2818',
     url : 'http://desktop-nns09r8:8081/repository/nuget-private-develop/'],
@@ -38,7 +42,8 @@ def nexus = [
     url : 'http://desktop-nns09r8:8081/repository/nuget-private-master/']
 ]
 
-def sonarHostUrl = 'http://desktop-nns09r8:8084'
+// String: SonarQube host URL.
+def _sonarHostUrl = 'http://desktop-nns09r8:8084'
 
 /**
  * Pipeline
@@ -47,7 +52,7 @@ pipeline {
   agent {
     node {
       label 'master'
-      customWorkspace "D:\\.ws\\ci\\${gitRepositoryName}-${BRANCH_NAME}".replaceAll('/', '-')
+      customWorkspace "D:\\.ws\\ci\\${_gitRepositoryName}-${BRANCH_NAME}".replaceAll('/', '-')
     }
   }
   
@@ -111,10 +116,10 @@ pipeline {
           def sonarQubeParameters = sprintf(
             '/k:%1$s /n:%2$s /v:%3$s /d:sonar.host.url=%4$s',
               [
-                gitRepositoryName + "-" + gitVersionProperties.GitVersion_PreReleaseLabel,
-                gitRepositoryName + "-" + gitVersionProperties.GitVersion_BranchName.replaceAll('/', '-'),
+                _gitRepositoryName + "-" + gitVersionProperties.GitVersion_PreReleaseLabel,
+                _gitRepositoryName + "-" + gitVersionProperties.GitVersion_BranchName.replaceAll('/', '-'),
                 gitVersionProperties.GitVersion_SemVer,
-                sonarHostUrl
+                _sonarHostUrl
               ])
               
           bat "${tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'} begin ${sonarQubeParameters}"
@@ -127,7 +132,7 @@ pipeline {
         script {
           def isFutureBranch = BRANCH_NAME.contains('/')
           def branch = isFutureBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
-          config = configuration[branch] ? configuration[branch] : 'Debug'
+          config = _configuration[branch] ? _configuration[branch] : 'Debug'
           bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=${config} /p:Platform=\"Any CPU\""
         }
       }
@@ -159,7 +164,7 @@ pipeline {
       }
       steps {
         script {
-          for (csProject in csProjects) {
+          for (csProject in _csProjects) {
             def packParameters = sprintf(
               '%1$s -Output %2$s -Properties Configuration="%3$s" -Symbols -IncludeReferencedProjects -Version %4$s',
               [
@@ -183,8 +188,8 @@ pipeline {
           dir(nupkgsDirectory) {
             def isFutureBranch = BRANCH_NAME.contains('/')
             def branch = isFutureBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
-            def credentialsId = nexus[branch] ? nexus[branch]['credentialsId'] : ''
-            def url = nexus[branch] ? nexus[branch]['url'] : ''
+            def credentialsId = _nexus[branch] ? _nexus[branch]['credentialsId'] : ''
+            def url = _nexus[branch] ? _nexus[branch]['url'] : ''
             
             withCredentials([
               string(
