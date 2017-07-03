@@ -216,7 +216,7 @@ pipeline {
       steps {
         script {
           def tagParameters = sprintf(
-            '-a %1$s -m "%2$s"',
+            '-a "%1$s" -m "%2$s"',
             [
               gitVersionProperties.GitVersion_SemVer,
               "Tag created by Jenkins."
