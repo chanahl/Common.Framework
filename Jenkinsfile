@@ -26,7 +26,7 @@ def _customWorkspace = 'D:\\.ws\\ci'
 // String: Git repository name.
 def _gitRepositoryName = 'Common.Framework'
 
-// Map[GitFlow Branch : [Jenkins CredentialsId (API Key), Nexus URL ]].
+// Map[GitFlow Branch : [Jenkins Credentials ID (API Key), Nexus URL ]].
 def _nexus = [
   develop : [
     credentialsId : '383c6d87-4ad7-405f-a4c3-3029c76c2818',
@@ -63,9 +63,12 @@ pipeline {
   }
   
   environment {
+    branch = null
     config = null
+    doNUnit = null
     gitVersionProperties = null
-    nunit = null
+    msbuildParameters = null
+    nunitDirectory = '.nunit-result'
     nupkgsDirectory = '.nupkgs'
   }
   
@@ -80,9 +83,23 @@ pipeline {
   }
   
   stages {    
-    stage('Clean') {
+    stage('Initialize') {
       steps {
         deleteDir()
+        script {
+          def isFutureBranch = BRANCH_NAME.contains('/')
+          branch = isFutureBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
+          
+          config = _configuration[branch] ? _configuration[branch] : 'Debug'
+          
+          msbuildParameters = sprintf(
+            '%1$s /p:Configuration="%2$s" /p:Platform="%3$s"',
+            [
+              "Common.Framework\\Common.Framework.sln",
+              config,
+              "Any CPU"
+            ])
+        }
       }
     }
     
@@ -121,13 +138,12 @@ pipeline {
         script {
           def sonarQubeParameters = sprintf(
             '/k:%1$s /n:%2$s /v:%3$s /d:sonar.host.url=%4$s',
-              [
-                _gitRepositoryName + "-" + gitVersionProperties.GitVersion_PreReleaseLabel,
-                _gitRepositoryName + "-" + gitVersionProperties.GitVersion_BranchName.replaceAll('/', '-'),
-                gitVersionProperties.GitVersion_SemVer,
-                _sonarHostUrl
-              ])
-              
+            [
+              _gitRepositoryName + "-" + gitVersionProperties.GitVersion_PreReleaseLabel,
+              _gitRepositoryName + "-" + gitVersionProperties.GitVersion_BranchName.replaceAll('/', '-'),
+              gitVersionProperties.GitVersion_SemVer,
+              _sonarHostUrl
+            ])
           bat "${tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'} begin ${sonarQubeParameters}"
         }
       }
@@ -136,18 +152,19 @@ pipeline {
     stage("Build") {
       steps {
         script {
-          def isFutureBranch = BRANCH_NAME.contains('/')
-          def branch = isFutureBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
-          config = _configuration[branch] ? _configuration[branch] : 'Debug'
-          bat "${tool name: 'msbuild-14.0', type: 'msbuild'} Common.Framework\\Common.Framework.sln /p:Configuration=${config} /p:Platform=\"Any CPU\""
+          bat "${tool name: 'msbuild-14.0', type: 'msbuild'} ${msbuildParameters}"
         }
       }
       post {
         failure {
-          steps {
-            script {
-              currentBuild.result = 'FAILURE'
-            }
+          script {
+            currentBuild.result = 'FAILURE'
+            doNUnit = false
+          }
+        }
+        success {
+          script {
+            doNUnit = false
           }
         }
       }
@@ -164,7 +181,7 @@ pipeline {
       }
     }
     
-    stage('Pack') {
+    stage('Nexus') {
       when {
         environment name: 'currentBuild.result', value: ''
       }
@@ -183,27 +200,54 @@ pipeline {
           }
         }
       }
+      post {
+        success {
+          script {
+            dir(nupkgsDirectory) {
+              def credentialsId = _nexus[branch] ? _nexus[branch]['credentialsId'] : ''
+              def url = _nexus[branch] ? _nexus[branch]['url'] : ''
+              withCredentials([
+                string(
+                  credentialsId: credentialsId,
+                  variable: 'apiKey')]) {
+                bat "${tool name: 'nuget-4.1.0', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} push *.symbols.nupkg ${apiKey} -Source ${url}"
+              }
+            }
+          }
+        }
+      }
     }
     
-    stage('Deploy') {
+    stage('NUnit') {
       when {
-        environment name: 'currentBuild.result', value: ''
+        expression { return doNUnit }
       }
       steps {
         script {
-          dir(nupkgsDirectory) {
-            def isFutureBranch = BRANCH_NAME.contains('/')
-            def branch = isFutureBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
-            def credentialsId = _nexus[branch] ? _nexus[branch]['credentialsId'] : ''
-            def url = _nexus[branch] ? _nexus[branch]['url'] : ''
-            
-            withCredentials([
-              string(
-                credentialsId: credentialsId,
-                variable: 'apiKey')]) {
-              bat "${tool name: 'nuget-4.1.0', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} push *.symbols.nupkg ${apiKey} -Source ${url}"
-            }
+          def nunitParameters = sprintf(
+            '%1$s --config="%2$s" --result="%3$s"',
+            [
+              "ProjectEuler\\ProjectEuler.Test\\bin\\${config}\\ProjectEuler.Test.dll",
+              config,
+              "${nunitDirectory}\\Common.Framework.Test.xml"
+            ])
+          bat """MD %nunitDirectory%
+            ${tool name: 'nunit3-console-3.6.1', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} ${nunitParameters}
+            EXIT /B 0"""
+        }
+      }
+      post {
+        failure {
+          script {
+            currentBuild.result = 'UNSTABLE'
           }
+        }
+        success {
+          nunit testResultsPattern: "**/${nunitDirectory}/Common.Framework.Test.xml",
+            debug: false,
+            keepJUnitReports: true,
+            skipJUnitArchiver: false,
+            failIfNoResults: false
         }
       }
     }
@@ -246,22 +290,10 @@ pipeline {
     always {
       bat 'set > env.out'
     }
-    success {
-      emailext (
-        attachLog: true,
-        body: """
-          <b>Result:</b> SUCCESS
-          <br><br>
-          <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
-          <br><br>
-          Check console output at ${BUILD_URL} to view the results.
-          <br>""",
-        mimeType: 'text/html',
-        recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-        subject: '[JENKINS]: ${PROJECT_NAME}',
-        to: 'hlc.alex@gmail.com'
-      )
-    }
+    // changed {
+    // }
+    // aborted {
+    // }
     failure {
       emailext (
         attachLog: true,
@@ -278,5 +310,23 @@ pipeline {
         to: 'hlc.alex@gmail.com'
       )
     }
+    success {
+      emailext (
+        attachLog: true,
+        body: """
+          <b>Result:</b> SUCCESS
+          <br><br>
+          <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
+          <br><br>
+          Check console output at ${BUILD_URL} to view the results.
+          <br>""",
+        mimeType: 'text/html',
+        recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+        subject: '[JENKINS]: ${PROJECT_NAME}',
+        to: 'hlc.alex@gmail.com'
+      )
+    }
+    // unstable {
+    // }
   }
 }
