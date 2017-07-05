@@ -82,7 +82,7 @@ pipeline {
     pollSCM('H/5 * * * *')
   }
   
-  stages {    
+  stages {
     stage('Initialize') {
       steps {
         deleteDir()
