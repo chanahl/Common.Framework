@@ -133,7 +133,7 @@ pipeline {
             }
             post {
                 always {
-                    bat "\"${tool name: '2.13.0.windows.1', type: 'git'}\" rev-parse HEAD > commitSHA1"
+                    bat "\"${tool name: '2.12.1.windows.1', type: 'git'}\" rev-parse HEAD > commitSHA1"
                     script {
                         commitSHA1 = readFile('commitSHA1').trim()
                     }
@@ -334,7 +334,7 @@ pipeline {
                         """,
                     mimeType: 'text/html',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    subject: '[JENKINS]: ${PROJECT_NAME}',
+                    subject: '[JENKINS]: ${_gitRepositoryName} - ${BRANCH_NAME}',
                     to: 'hlc.alex@gmail.com'
             )
         }
@@ -367,7 +367,7 @@ pipeline {
                         """,
                     mimeType: 'text/html',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    subject: '[JENKINS]: ${PROJECT_NAME}',
+                    subject: '[JENKINS]: ${_gitRepositoryName} - ${BRANCH_NAME}',
                     to: 'hlc.alex@gmail.com'
             )
         }
