@@ -134,7 +134,9 @@ pipeline {
             post {
                 always {
                     bat "\"${tool name: '2.13.0.windows.1', type: 'git'}\" rev-parse HEAD > commitSHA1"
-                    commitSHA1 = readFile('commitSHA1').trim()
+                    script {
+                        commitSHA1 = readFile('commitSHA1').trim()
+                    }
                 }
             }
         }
