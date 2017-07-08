@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Common.Framework.Core.Enums;
 using Common.Framework.Core.Extensions;
 using Common.Framework.Core.Logging;
@@ -17,7 +18,7 @@ using Common.Framework.Data.Interfaces;
 
 namespace Common.Framework.Data.Managers
 {
-    public class FlatFileDataManager : IDisposable, IFlatFileDataManager
+    public class FlatFileDataManager : IFlatFileDataManager
     {
         private bool _disposed;
 
@@ -55,16 +56,16 @@ namespace Common.Framework.Data.Managers
         public T LoadNonCollection<T>()
         {
             string line;
-            var input = string.Empty;
+            var input = new StringBuilder();
             
             while ((line = Stream.ReadLine()) != null)
             {
-                input += line;
+                input.Append(line);
             }
 
             Dispose();
 
-            return (T)Converter.ConvertFromString(input);
+            return (T)Converter.ConvertFromString(input.ToString());
         }
 
         public T[] LoadArray1D<T>()
@@ -187,15 +188,10 @@ namespace Common.Framework.Data.Managers
             return t;
         }
 
-        public void Close()
+        public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        public void Dispose()
-        {
-            Close();
         }
 
         protected virtual void Dispose(bool disposing)
@@ -205,12 +201,9 @@ namespace Common.Framework.Data.Managers
                 return;
             }
 
-            if (disposing)
+            if (disposing && Stream != null)
             {
-                if (Stream != null)
-                {
-                    Stream.Dispose();
-                }
+                Stream.Dispose();
             }
 
             _disposed = true;

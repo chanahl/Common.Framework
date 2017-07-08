@@ -44,15 +44,15 @@ namespace Common.Framework.Network.Distribution
                 return;
             }
 
-            if (info is DirectoryInfo)
+            var directoryInfo = info as DirectoryInfo;
+            if (directoryInfo != null)
             {
-                var directoryInfo = (DirectoryInfo)info;
                 files = directoryInfo.FullName.FindAllFiles();
             }
 
-            if (info is FileInfo)
+            var fileInfo = info as FileInfo;
+            if (fileInfo != null)
             {
-                var fileInfo = (FileInfo)info;
                 files.Add(fileInfo.FullName);
             }
 

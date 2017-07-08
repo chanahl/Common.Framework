@@ -50,12 +50,9 @@ namespace Common.Framework.Core.AppRunners
                                 : appConfigParametersSection[collectionName].Collection[switchName];
 
                         bool tryParse;
-                        if (bool.TryParse(value, out tryParse))
+                        if (bool.TryParse(value, out tryParse) && !Convert.ToBoolean(value))
                         {
-                            if (!Convert.ToBoolean(value))
-                            {
-                                continue;
-                            }
+                            continue;
                         }
 
                         var stringIsNullOrEmpty = string.IsNullOrEmpty(value);
@@ -65,8 +62,12 @@ namespace Common.Framework.Core.AppRunners
                         }
 
                         var instance = Instantiate<T>(assemblyType, construct, arguments);
+                        if (instance == null)
+                        {
+                            continue;
+                        }
+
                         RegisterInstance(instance);
-                        break;
                     }
                     // ReSharper disable once EmptyGeneralCatchClause
                     catch (Exception)
@@ -91,11 +92,6 @@ namespace Common.Framework.Core.AppRunners
 
         protected void RegisterInstance<T>(T instance)
         {
-            if (instance.Equals(null))
-            {
-                return;
-            }
-
             Objects.Add(instance.GetType().Name, instance);
         }
 

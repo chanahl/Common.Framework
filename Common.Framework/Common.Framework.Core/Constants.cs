@@ -6,7 +6,7 @@
 
 namespace Common.Framework.Core
 {
-    public class Constants
+    public static class Constants
     {
         #region App.config Configuration Sections
 
