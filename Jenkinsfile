@@ -317,11 +317,7 @@ pipeline {
                         <table style=" width: 100%;word-break: break-all;table-layout: fixed;">
                             <tr>
                                 <td>
-                                    <center><b>Report</b></center>
-                                    <br>
                                     <b>Result:</b> FAILURE</div>
-                                    <br><br>
-                                    <b>Branch:</b> ${branch}
                                     <br>
                                     <b>Commit:</b> ${commitSHA1}
                                     <br>
@@ -334,7 +330,7 @@ pipeline {
                         """,
                     mimeType: 'text/html',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    subject: '[JENKINS]: ${_gitRepositoryName} - ${BRANCH_NAME}',
+                    subject: "[JENKINS]: ${_gitRepositoryName} - ${BRANCH_NAME}",
                     to: 'hlc.alex@gmail.com'
             )
         }
@@ -350,11 +346,7 @@ pipeline {
                         <table style=" width: 100%;word-break: break-all;table-layout: fixed;">
                             <tr>
                                 <td>
-                                    <center><b>Report</b></center>
-                                    <br>
                                     <b>Result:</b> SUCCESS</div>
-                                    <br><br>
-                                    <b>Branch:</b> ${branch}
                                     <br>
                                     <b>Commit:</b> ${commitSHA1}
                                     <br>
@@ -367,7 +359,7 @@ pipeline {
                         """,
                     mimeType: 'text/html',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    subject: '[JENKINS]: ${_gitRepositoryName} - ${BRANCH_NAME}',
+                    subject: "[JENKINS]: ${_gitRepositoryName} - ${BRANCH_NAME}",
                     to: 'hlc.alex@gmail.com'
             )
         }
