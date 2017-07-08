@@ -69,6 +69,7 @@ pipeline {
 
     environment {
         branch = null
+        commitSHA1 = null
         config = null
         doStageDeploy = null
         doStageNUnit = null
@@ -128,6 +129,12 @@ pipeline {
                     gitVersionProperties.load(inputStream)
 
                     currentBuild.displayName = gitVersionProperties.GitVersion_SemVer
+                }
+            }
+            post {
+                always {
+                    bat "\"${tool name: '2.13.0.windows.1', type: 'git'}\" rev-parse HEAD > commitSHA1"
+                    commitSHA1 = readFile('commitSHA1').trim()
                 }
             }
         }
@@ -299,13 +306,30 @@ pipeline {
         failure {
             emailext(
                     attachLog: true,
-                    body: """
-                        <b>Result:</b> FAILURE
-                        <br><br>
-                        <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
-                        <br><br>
-                        Check console output at ${BUILD_URL} to view the results.
-                        <br>""",
+                    body: """<!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+                        </head>
+                        <body>
+                        <table style=" width: 100%;word-break: break-all;table-layout: fixed;">
+                            <tr>
+                                <td>
+                                    <center><b>Report</b></center>
+                                    <br>
+                                    <b>Result:</b> FAILURE</div>
+                                    <br><br>
+                                    <b>Branch:</b> ${branch}
+                                    <br>
+                                    <b>Commit:</b> ${commitSHA1}
+                                    <br>
+                                    <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
+                                    <br><br>
+                                </td>
+                            </tr>
+                        </table>
+                        </html>
+                        """,
                     mimeType: 'text/html',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
                     subject: '[JENKINS]: ${PROJECT_NAME}',
@@ -315,13 +339,30 @@ pipeline {
         success {
             emailext(
                     attachLog: true,
-                    body: """
-                        <b>Result:</b> SUCCESS
-                        <br><br>
-                        <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
-                        <br><br>
-                        Check console output at ${BUILD_URL} to view the results.
-                        <br>""",
+                    body: """<!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+                        </head>
+                        <body>
+                        <table style=" width: 100%;word-break: break-all;table-layout: fixed;">
+                            <tr>
+                                <td>
+                                    <center><b>Report</b></center>
+                                    <br>
+                                    <b>Result:</b> SUCCESS</div>
+                                    <br><br>
+                                    <b>Branch:</b> ${branch}
+                                    <br>
+                                    <b>Commit:</b> ${commitSHA1}
+                                    <br>
+                                    <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
+                                    <br><br>
+                                </td>
+                            </tr>
+                        </table>
+                        </html>
+                        """,
                     mimeType: 'text/html',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
                     subject: '[JENKINS]: ${PROJECT_NAME}',
