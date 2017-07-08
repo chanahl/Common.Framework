@@ -13,6 +13,8 @@ namespace Common.Framework.Network.Security
 {
     public class Impersonator : IDisposable
     {
+        private bool _disposed;
+
         private WindowsImpersonationContext _wic;
 
         public Impersonator()
@@ -67,7 +69,7 @@ namespace Common.Framework.Network.Security
             LogonType logonType,
             LogonProvider logonProvider)
         {
-            UndoImpersonation();
+            Dispose(true);
 
             var logonToken = IntPtr.Zero;
             var logonTokenDuplicate = IntPtr.Zero;
@@ -118,17 +120,25 @@ namespace Common.Framework.Network.Security
 
         public void Dispose()
         {
-            UndoImpersonation();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        private void UndoImpersonation()
+        protected virtual void Dispose(bool disposing)
         {
+            if (_disposed)
+            {
+                return;
+            }
+
             if (_wic != null)
             {
                 _wic.Undo();
             }
 
             _wic = null;
+
+            _disposed = true;
         }
     }
 }

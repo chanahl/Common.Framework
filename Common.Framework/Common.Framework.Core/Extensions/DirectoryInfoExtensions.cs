@@ -39,12 +39,9 @@ namespace Common.Framework.Core.Extensions
                 return path;
             }
 
-            if (path[1] == ':')
+            if (path[1] == ':' && (path.Length == 2 || path[2] == Path.DirectorySeparatorChar))
             {
-                if (path.Length == 2 || path[2] == Path.DirectorySeparatorChar)
-                {
-                    return Path.GetFullPath(path);
-                }
+                return Path.GetFullPath(path);
             }
 
             if (path[0] == Path.DirectorySeparatorChar)
