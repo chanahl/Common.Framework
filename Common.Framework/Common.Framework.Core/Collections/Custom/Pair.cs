@@ -5,8 +5,8 @@
 // <author>Alex H.-L. Chan</author>
 
 using System;
-// ReSharper disable NonReadonlyMemberInGetHashCode
 
+// ReSharper disable NonReadonlyMemberInGetHashCode
 namespace Common.Framework.Core.Collections.Custom
 {
     public class Pair<T> : IEquatable<Pair<T>>
