@@ -6,6 +6,7 @@
 
 using System;
 
+// ReSharper disable NonReadonlyMemberInGetHashCode
 namespace Common.Framework.Core.Collections.Custom
 {
     public class Pair<T> : IEquatable<Pair<T>>
@@ -18,9 +19,9 @@ namespace Common.Framework.Core.Collections.Custom
             Second = second;
         }
 
-        public T First { get; }
+        public T First { get; set; }
 
-        public T Second { get; }
+        public T Second { get; set; }
 
         public bool Equals(Pair<T> pair)
         {
