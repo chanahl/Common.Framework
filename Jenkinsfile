@@ -322,7 +322,8 @@ pipeline {
                                     <b>Commit:</b> ${commitSHA1}
                                     <br>
                                     <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
-                                    <br><br>
+                                    <br>
+                                    <b>URL:</b> ${BUILD_URL}
                                 </td>
                             </tr>
                         </table>
@@ -351,7 +352,8 @@ pipeline {
                                     <b>Commit:</b> ${commitSHA1}
                                     <br>
                                     <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
-                                    <br><br>
+                                    <br>
+                                    <b>URL:</b> ${BUILD_URL}
                                 </td>
                             </tr>
                         </table>
