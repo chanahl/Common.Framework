@@ -265,8 +265,8 @@ pipeline {
 
         stage('Tag') {
             when {
+                branch 'master'
                 environment name: 'currentBuild.result', value: ''
-                expression { BRANCH_NAME ==~ /(develop|master)/ }
             }
             steps {
                 script {
