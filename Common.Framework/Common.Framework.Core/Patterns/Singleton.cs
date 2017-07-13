@@ -8,18 +8,18 @@ namespace Common.Framework.Core.Patterns
 {
     public class Singleton<TInstance, TProperty> where TInstance : new() where TProperty : new()
     {
-        private static TInstance _instance;
-
         public TProperty Property { get; private set; }
+
+        private static TInstance TheInstance { get; set; }
 
         public static TInstance Instance()
         {
-            if (_instance == null)
+            if (TheInstance == null)
             {
-                _instance = new TInstance();
+                TheInstance = new TInstance();
             }
 
-            return _instance;
+            return TheInstance;
         }
 
         public void InitializeProperty()

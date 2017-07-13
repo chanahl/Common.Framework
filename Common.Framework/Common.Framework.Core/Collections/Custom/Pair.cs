@@ -4,9 +4,12 @@
 // <clrversion>4.0.30319.42000</clrversion>
 // <author>Alex H.-L. Chan</author>
 
+using System;
+
+// ReSharper disable NonReadonlyMemberInGetHashCode
 namespace Common.Framework.Core.Collections.Custom
 {
-    public class Pair<T>
+    public class Pair<T> : IEquatable<Pair<T>>
     {
         public Pair(
             T first,
@@ -19,16 +22,20 @@ namespace Common.Framework.Core.Collections.Custom
         public T First { get; set; }
 
         public T Second { get; set; }
-        
-        public override bool Equals(object obj)
+
+        public bool Equals(Pair<T> pair)
         {
-            var pair = obj as Pair<T>;
             if (pair == null)
             {
                 return false;
             }
 
             return First.Equals(pair.First) && Second.Equals(pair.Second);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Pair<T>);
         }
 
         public override int GetHashCode()

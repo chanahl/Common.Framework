@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Common.Framework.Data.Interfaces
 {
-    public interface IFlatFileDataManager
+    public interface IFlatFileDataManager : IDisposable
     {
         BuiltInType BuiltInType { get; set; }
 
@@ -41,9 +41,5 @@ namespace Common.Framework.Data.Interfaces
         T[][] LoadArrayJagged<T>();
 
         List<T> LoadList<T>();
-
-        void Close();
-
-        void Dispose();
     }
 }
