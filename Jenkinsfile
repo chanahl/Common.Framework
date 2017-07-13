@@ -275,7 +275,7 @@ pipeline {
                             '-a "%1$s" -m "%2$s"',
                             [
                                     gitVersionProperties.GitVersion_SemVer,
-                                    "Tag created by Jenkins."
+                                    "Tagged by Jenkins."
                             ])
                     bat "\"${tool name: '2.12.1.windows.1', type: 'git'}\" tag ${tagParameters}"
 
