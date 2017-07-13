@@ -112,7 +112,7 @@ pipeline {
             }
         }
 
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
                 checkout scm
             }
@@ -149,7 +149,7 @@ pipeline {
 
         stage('SonarQube Begin') {
             when {
-                expression { BRANCH_NAME ==~ /(develop|master)/ }
+                anyOf { branch 'develop'; branch 'release'; branch 'master' }
             }
             steps {
                 script {
@@ -187,7 +187,7 @@ pipeline {
 
         stage('SonarQube End') {
             when {
-                expression { BRANCH_NAME ==~ /(develop|master)/ }
+                anyOf { branch 'develop'; branch 'release'; branch 'master' }
             }
             steps {
                 bat "${tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'} end"
@@ -196,6 +196,7 @@ pipeline {
 
         stage('Deploy') {
             when {
+                anyOf { branch 'develop'; branch 'release'; branch 'master' }
                 environment name: 'currentBuild.result', value: ''
                 expression { return doStageDeploy }
             }
