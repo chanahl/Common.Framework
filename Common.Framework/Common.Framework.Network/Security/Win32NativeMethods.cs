@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 
 namespace Common.Framework.Network.Security
 {
-    public class Win32NativeMethods
+    public static class Win32NativeMethods
     {
         [DllImport("advapi32.dll", SetLastError = true)]
         public static extern int LogonUser(
