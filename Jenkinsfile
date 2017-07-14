@@ -158,7 +158,7 @@ pipeline {
                     def sonarQubeParameters = sprintf(
                             '/k:%1$s /n:%2$s /v:%3$s /d:sonar.host.url=%4$s',
                             [
-                                    _gitRepositoryName,
+                                    _gitRepositoryName + "-" + gitVersionProperties.GitVersion_BranchName.replaceAll('/', '-'),
                                     _gitRepositoryName + "-" + gitVersionProperties.GitVersion_BranchName.replaceAll('/', '-'),
                                     gitVersion,
                                     _sonarHostUrl
