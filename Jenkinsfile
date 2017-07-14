@@ -73,6 +73,7 @@ pipeline {
         config = null
         doStageDeploy = null
         doStageNUnit = null
+        gitVersion = null
         gitVersionProperties = null
         msbuildParameters = null
         nunitDirectory = '.nunit-result'
@@ -94,8 +95,8 @@ pipeline {
             steps {
                 deleteDir()
                 script {
-                    def isFutureBranch = BRANCH_NAME.contains('/')
-                    branch = isFutureBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
+                    def isTopicBranch = BRANCH_NAME.contains('/')
+                    branch = isTopicBranch ? BRANCH_NAME.split('/')[0] : BRANCH_NAME
 
                     config = _configuration[branch] ? _configuration[branch] : 'Debug'
 
@@ -128,7 +129,8 @@ pipeline {
                     InputStream inputStream = new ByteArrayInputStream(content.getBytes())
                     gitVersionProperties.load(inputStream)
 
-                    currentBuild.displayName = gitVersionProperties.GitVersion_SemVer
+                    gitVersion = branch == "master" ? gitVersionProperties.GitVersion_MajorMinorPatch : gitVersionProperties.GitVersion_SemVer
+                    currentBuild.displayName = gitVersion
                 }
             }
             post {
@@ -156,9 +158,9 @@ pipeline {
                     def sonarQubeParameters = sprintf(
                             '/k:%1$s /n:%2$s /v:%3$s /d:sonar.host.url=%4$s',
                             [
-                                    _gitRepositoryName + "-" + gitVersionProperties.GitVersion_PreReleaseLabel,
+                                    _gitRepositoryName,
                                     _gitRepositoryName + "-" + gitVersionProperties.GitVersion_BranchName.replaceAll('/', '-'),
-                                    gitVersionProperties.GitVersion_SemVer,
+                                    gitVersion,
                                     _sonarHostUrl
                             ])
                     bat "${tool name: 'sonar-scanner-msbuild-3.0.0.629', type: 'hudson.plugins.sonar.MsBuildSQRunnerInstallation'} begin ${sonarQubeParameters}"
@@ -209,7 +211,7 @@ pipeline {
                                         csProject,
                                         nupkgsDirectory,
                                         config,
-                                        gitVersionProperties.GitVersion_SemVer
+                                        gitVersion
                                 ])
                         bat "${tool name: 'nuget-4.1.0', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'} pack ${packParameters}"
                     }
@@ -274,7 +276,7 @@ pipeline {
                     def tagParameters = sprintf(
                             '-a "%1$s" -m "%2$s"',
                             [
-                                    gitVersionProperties.GitVersion_MajorMinorPatch,
+                                    gitVersion,
                                     "Tagged by Jenkins."
                             ])
                     bat "\"${tool name: '2.12.1.windows.1', type: 'git'}\" tag ${tagParameters}"
@@ -322,7 +324,7 @@ pipeline {
                                     <br>
                                     <b>Commit:</b> ${commitSHA1}
                                     <br>
-                                    <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
+                                    <b>Version:</b> ${gitVersion}
                                     <br>
                                     <b>URL:</b> ${BUILD_URL}
                                 </td>
@@ -352,7 +354,7 @@ pipeline {
                                     <br>
                                     <b>Commit:</b> ${commitSHA1}
                                     <br>
-                                    <b>Version:</b> ${gitVersionProperties.GitVersion_SemVer}
+                                    <b>Version:</b> ${gitVersion}
                                     <br>
                                     <b>URL:</b> ${BUILD_URL}
                                 </td>
